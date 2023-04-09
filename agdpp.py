@@ -13,6 +13,7 @@ class Game:
     >>> loop = GameLoop.create_null(
     ...     events=[
     ...         [],
+    ...         [],
     ...         [pygame.event.Event(pygame.QUIT)],
     ...     ]
     ... )
@@ -20,25 +21,36 @@ class Game:
     >>> Game(loop).run()
     >>> events
     PYGAME_INIT =>
+    CLEAR_SCREEN =>
     DRAW_CIRCLE =>
+        x: 50
+    CLEAR_SCREEN =>
+    DRAW_CIRCLE =>
+        x: 51
     PYGAME_QUIT =>
     """
 
     def __init__(self, loop):
         self.loop = loop
+        self.x = 50
 
     def run(self):
         self.loop.run(self)
 
-    def tick(self, events):
+    def tick(self, dt, events):
         for event in events:
             if event.type == pygame.QUIT:
                 return True
-        self.loop.draw_circle()
+        if self.x > 500:
+            self.x = 50
+        else:
+            self.x += dt
+        self.loop.clear_screen()
+        self.loop.draw_circle(self.x)
 
 class NullGame(Observable):
 
-    def tick(self, events):
+    def tick(self, dt, events):
         self.notify("EVENTS", {"events": events})
         return True
 
@@ -78,6 +90,7 @@ class GameLoop(Observable):
                 self.display = NullDisplay()
                 self.draw = NullDraw()
                 self.event = NullEvent()
+                self.time = NullTime()
             def quit(self):
                 pass
         class NullDisplay:
@@ -86,7 +99,8 @@ class GameLoop(Observable):
             def flip(self):
                 pass
         class NullScreen:
-            pass
+            def fill(self, color):
+                pass
         class NullDraw:
             def circle(self, screen, color, position, radius):
                 pass
@@ -95,6 +109,10 @@ class GameLoop(Observable):
                 if events:
                     return events.pop(0)
                 return []
+        class NullTime:
+            class Clock:
+                def tick(self, fps):
+                    return 1
         return GameLoop(NullPygame())
 
     def __init__(self, pygame):
@@ -105,17 +123,24 @@ class GameLoop(Observable):
         self.notify("PYGAME_INIT", {})
         self.pygame.init()
         self.screen = self.pygame.display.set_mode((1280, 720))
+        clock = self.pygame.time.Clock()
         running = True
+        dt = 0
         while running:
-            if game.tick(self.pygame.event.get()):
+            if game.tick(dt, self.pygame.event.get()):
                 running = False
             self.pygame.display.flip()
+            dt = clock.tick(60)
         self.notify("PYGAME_QUIT", {})
         self.pygame.quit()
 
-    def draw_circle(self):
-        self.notify("DRAW_CIRCLE", {})
-        self.pygame.draw.circle(self.screen, "red", (50, 50), 40)
+    def clear_screen(self):
+        self.notify("CLEAR_SCREEN", {})
+        self.screen.fill("purple")
+
+    def draw_circle(self, x):
+        self.notify("DRAW_CIRCLE", {"x": x})
+        self.pygame.draw.circle(self.screen, "red", (x, 50), 40)
 
 if __name__ == "__main__":
     Game(GameLoop.create()).run()
