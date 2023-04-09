@@ -18,13 +18,16 @@ class Game:
         self.loop.run(self)
 
     def tick(self):
-        print("DRAW_CIRCLE")
+        self.loop.draw_circle()
 
 class GameLoop:
 
     def run(self, game):
         game.tick()
         print("EXIT")
+
+    def draw_circle(self):
+        print("DRAW_CIRCLE")
 
 if __name__ == "__main__":
     Game().run()
