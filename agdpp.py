@@ -40,7 +40,7 @@ class Game:
     def tick(self, dt, events):
         for event in events:
             if event.type == pygame.QUIT:
-                return True
+                raise ExitGameLoop()
         if self.x > 500:
             self.x = 50
         else:
@@ -53,7 +53,7 @@ class NullGame(Observable):
     def tick(self, dt, events):
         self.notify("TICK", {})
         self.notify("EVENTS", {"events": events})
-        return True
+        raise ExitGameLoop()
 
 class GameLoop(Observable):
 
@@ -132,13 +132,14 @@ class GameLoop(Observable):
         self.pygame.init()
         self.screen = self.pygame.display.set_mode((1280, 720))
         clock = self.pygame.time.Clock()
-        running = True
         dt = 0
-        while running:
-            if game.tick(dt, self.pygame.event.get()):
-                running = False
-            self.pygame.display.flip()
-            dt = clock.tick(60)
+        try:
+            while True:
+                game.tick(dt, self.pygame.event.get())
+                self.pygame.display.flip()
+                dt = clock.tick(60)
+        except ExitGameLoop:
+            pass
         self.notify("PYGAME_QUIT", {})
         self.pygame.quit()
 
@@ -149,6 +150,9 @@ class GameLoop(Observable):
     def draw_circle(self, x):
         self.notify("DRAW_CIRCLE", {"x": x})
         self.pygame.draw.circle(self.screen, "red", (x, 50), 40)
+
+class ExitGameLoop(Exception):
+    pass
 
 if __name__ == "__main__":
     Game(GameLoop.create()).run()
