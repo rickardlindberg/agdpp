@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 
+from events import Observable
+from events import Events
+
 class Game:
 
     """
     I draw an animated circle until the user closes the window.
 
-    >>> game = Game(GameLoop())
-    >>> game.run()
-    DRAW_CIRCLE
-    EXIT
+    >>> loop = GameLoop()
+    >>> events = loop.track_events()
+    >>> Game(loop).run()
+    >>> events
+    DRAW_CIRCLE =>
+    EXIT =>
     """
 
     def __init__(self, loop):
@@ -20,14 +25,21 @@ class Game:
     def tick(self):
         self.loop.draw_circle()
 
-class GameLoop:
+class GameLoop(Observable):
+
+    """
+    * init pygame
+    * cleanup pygame
+    * call tick method of game
+    * draw circles on current frame
+    """
 
     def run(self, game):
         game.tick()
-        print("EXIT")
+        self.notify("EXIT", {})
 
     def draw_circle(self):
-        print("DRAW_CIRCLE")
+        self.notify("DRAW_CIRCLE", {})
 
 if __name__ == "__main__":
     Game().run()
