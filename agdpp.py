@@ -59,8 +59,19 @@ class GameLoop(Observable):
     def create_null():
         class NullPygame:
             def init(self):
-                pass
+                self.display = NullDisplay()
+                self.draw = NullDraw()
             def quit(self):
+                pass
+        class NullDisplay:
+            def set_mode(self, resolution):
+                return NullScreen()
+            def flip(self):
+                pass
+        class NullScreen:
+            pass
+        class NullDraw:
+            def circle(self, screen, color, position, radius):
                 pass
         return GameLoop(NullPygame())
 
@@ -71,12 +82,15 @@ class GameLoop(Observable):
     def run(self, game):
         self.notify("PYGAME_INIT", {})
         self.pygame.init()
+        self.screen = self.pygame.display.set_mode((1280, 720))
         game.tick()
+        self.pygame.display.flip()
         self.notify("EXIT", {})
         self.pygame.quit()
 
     def draw_circle(self):
         self.notify("DRAW_CIRCLE", {})
+        self.pygame.draw.circle(self.screen, "red", (50, 50), 40)
 
 if __name__ == "__main__":
     Game(GameLoop.create()).run()
