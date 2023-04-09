@@ -51,6 +51,7 @@ class Game:
 class NullGame(Observable):
 
     def tick(self, dt, events):
+        self.notify("TICK", {})
         self.notify("EVENTS", {"events": events})
         return True
 
@@ -66,17 +67,24 @@ class GameLoop(Observable):
     PYGAME_INIT =>
     PYGAME_QUIT =>
 
+    I do the same thing when run for real:
+
+    >>> loop = GameLoop.create()
+    >>> events = loop.track_events()
+    >>> loop.run(NullGame())
+    >>> events
+    PYGAME_INIT =>
+    PYGAME_QUIT =>
+
     I can simulate events:
 
     >>> game = NullGame()
     >>> events = game.track_events()
     >>> GameLoop.create_null(events=[[1], [2]]).run(game)
     >>> events
+    TICK =>
     EVENTS =>
         events: [1]
-
-    * call tick method of game until we should exit
-    * draw circles on current frame
     """
 
     @staticmethod
