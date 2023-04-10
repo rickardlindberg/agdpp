@@ -23,15 +23,15 @@ class GameLoop(Observable):
     PYGAME_INIT =>
     PYGAME_QUIT =>
 
-    I can simulate events:
+    I pass simulated events to the game tick method:
 
     >>> game = TestGameThatNotifiesAndExitsImmediately()
     >>> events = game.track_events()
-    >>> GameLoop.create_null(events=[[1], [2]]).run(game)
+    >>> GameLoop.create_null(events=[["some event"]]).run(game)
     >>> events
     TICK =>
-    EVENTS =>
-        events: [1]
+        td: 0
+        events: ['some event']
     """
 
     @staticmethod
@@ -108,6 +108,5 @@ class ExitGameLoop(Exception):
 class TestGameThatNotifiesAndExitsImmediately(Observable):
 
     def tick(self, dt, events):
-        self.notify("TICK", {})
-        self.notify("EVENTS", {"events": events})
+        self.notify("TICK", {"td": dt, "events": events})
         raise ExitGameLoop()
