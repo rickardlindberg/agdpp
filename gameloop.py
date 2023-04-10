@@ -30,7 +30,7 @@ class GameLoop(Observable):
     >>> GameLoop.create_null(events=[["some event"]]).run(game)
     >>> events
     TICK =>
-        td: 0
+        dt: 0
         events: ['some event']
     """
 
@@ -108,5 +108,5 @@ class ExitGameLoop(Exception):
 class TestGameThatNotifiesAndExitsImmediately(Observable):
 
     def tick(self, dt, events):
-        self.notify("TICK", {"td": dt, "events": events})
+        self.notify("TICK", {"dt": dt, "events": events})
         raise ExitGameLoop()
