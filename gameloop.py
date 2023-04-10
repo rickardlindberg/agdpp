@@ -9,7 +9,7 @@ class GameLoop(Observable):
 
     >>> loop = GameLoop.create_null()
     >>> events = loop.track_events()
-    >>> loop.run(TestGame())
+    >>> loop.run(TestGameThatNotifiesAndExitsImmediately())
     >>> events
     PYGAME_INIT =>
     PYGAME_QUIT =>
@@ -18,14 +18,14 @@ class GameLoop(Observable):
 
     >>> loop = GameLoop.create()
     >>> events = loop.track_events()
-    >>> loop.run(TestGame())
+    >>> loop.run(TestGameThatNotifiesAndExitsImmediately())
     >>> events
     PYGAME_INIT =>
     PYGAME_QUIT =>
 
     I can simulate events:
 
-    >>> game = TestGame()
+    >>> game = TestGameThatNotifiesAndExitsImmediately()
     >>> events = game.track_events()
     >>> GameLoop.create_null(events=[[1], [2]]).run(game)
     >>> events
@@ -102,7 +102,7 @@ class GameLoop(Observable):
 class ExitGameLoop(Exception):
     pass
 
-class TestGame(Observable):
+class TestGameThatNotifiesAndExitsImmediately(Observable):
 
     def tick(self, dt, events):
         self.notify("TICK", {})
