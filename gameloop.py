@@ -99,6 +99,9 @@ class GameLoop(Observable):
         self.notify("DRAW_CIRCLE", {"x": x})
         self.pygame.draw.circle(self.screen, "red", (x, 50), 40)
 
+    def quit(self):
+        raise ExitGameLoop()
+
 class ExitGameLoop(Exception):
     pass
 

@@ -2,7 +2,6 @@
 
 import pygame
 
-from gameloop import ExitGameLoop
 from gameloop import GameLoop
 
 class Game:
@@ -40,7 +39,7 @@ class Game:
     def tick(self, dt, events):
         for event in events:
             if event.type == pygame.QUIT:
-                raise ExitGameLoop()
+                self.loop.quit()
         if self.x > 500:
             self.x = 50
         else:
