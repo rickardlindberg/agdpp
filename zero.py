@@ -9,7 +9,11 @@ if __name__ == "__main__":
     command = sys.argv[1:]
     if command == ["build"]:
         suite = unittest.TestSuite()
-        for module in ["agdpp", "events"]:
+        for module in [
+            "agdpp",
+            "events",
+            "gameloop",
+        ]:
             suite.addTest(doctest.DocTestSuite(
                 importlib.import_module(module),
                 optionflags=doctest.REPORT_NDIFF|doctest.FAIL_FAST
