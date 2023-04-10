@@ -87,8 +87,9 @@ class GameLoop(Observable):
                 dt = clock.tick(60)
         except ExitGameLoop:
             pass
-        self.notify("PYGAME_QUIT", {})
-        self.pygame.quit()
+        finally:
+            self.notify("PYGAME_QUIT", {})
+            self.pygame.quit()
 
     def clear_screen(self):
         self.notify("CLEAR_SCREEN", {})
