@@ -82,7 +82,7 @@ class GameLoop(Observable):
         dt = 0
         try:
             while True:
-                game.tick(dt, self.pygame.event.get())
+                game.tick(dt, [Event(x) for x in self.pygame.event.get()])
                 self.pygame.display.flip()
                 dt = clock.tick(60)
         except ExitGameLoop:
@@ -101,6 +101,17 @@ class GameLoop(Observable):
 
     def quit(self):
         raise ExitGameLoop()
+
+class Event:
+
+    def __init__(self, pygame_event):
+        self.pygame_event = pygame_event
+
+    def is_user_closed_window(self):
+        return self.pygame_event.type == pygame.QUIT
+
+    def __repr__(self):
+        return repr(self.pygame_event)
 
 class ExitGameLoop(Exception):
     pass

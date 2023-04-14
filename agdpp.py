@@ -38,7 +38,7 @@ class Game:
 
     def tick(self, dt, events):
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.is_user_closed_window():
                 self.loop.quit()
         if self.x > 500:
             self.x = 50
