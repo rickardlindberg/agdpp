@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import pygame
-
 from gameloop import GameLoop
 
 class Game:
@@ -13,7 +11,7 @@ class Game:
     ...     events=[
     ...         [],
     ...         [],
-    ...         [pygame.event.Event(pygame.QUIT)],
+    ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
     >>> events = loop.track_events()

@@ -27,7 +27,7 @@ class GameLoop(Observable):
 
     >>> game = TestGameThatNotifiesAndExitsImmediately()
     >>> events = game.track_events()
-    >>> GameLoop.create_null(events=[["some event"]]).run(game)
+    >>> GameLoop.create_null(events=[[Event("some event")]]).run(game)
     >>> events
     TICK =>
         dt: 0
@@ -62,13 +62,21 @@ class GameLoop(Observable):
         class NullEvent:
             def get(self):
                 if events:
-                    return events.pop(0)
+                    return [x.pygame_event for x in events.pop(0)]
                 return []
         class NullTime:
             class Clock:
                 def tick(self, fps):
                     return 1
         return GameLoop(NullPygame())
+
+    @staticmethod
+    def create_event_user_closed_window():
+        """
+        >>> GameLoop.create_event_user_closed_window().is_user_closed_window()
+        True
+        """
+        return Event(pygame.event.Event(pygame.QUIT))
 
     def __init__(self, pygame):
         Observable.__init__(self)
