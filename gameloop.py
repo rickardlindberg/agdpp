@@ -11,8 +11,10 @@ class GameLoop(Observable):
     >>> events = loop.track_events()
     >>> loop.run(TestGameThatNotifiesAndExitsImmediately())
     >>> events
-    PYGAME_INIT =>
-    PYGAME_QUIT =>
+    GAMELOOP_INIT =>
+        resolution: (1280, 720)
+        fps: 60
+    GAMELOOP_QUIT =>
 
     I do the same thing when run for real:
 
@@ -20,8 +22,10 @@ class GameLoop(Observable):
     >>> events = loop.track_events()
     >>> loop.run(TestGameThatNotifiesAndExitsImmediately())
     >>> events
-    PYGAME_INIT =>
-    PYGAME_QUIT =>
+    GAMELOOP_INIT =>
+        resolution: (1280, 720)
+        fps: 60
+    GAMELOOP_QUIT =>
 
     I pass simulated events to the game tick method:
 
@@ -82,21 +86,21 @@ class GameLoop(Observable):
         Observable.__init__(self)
         self.pygame = pygame
 
-    def run(self, game):
-        self.notify("PYGAME_INIT", {})
+    def run(self, game, resolution=(1280, 720), fps=60):
+        self.notify("GAMELOOP_INIT", {"resolution": resolution, "fps": fps})
         self.pygame.init()
-        self.screen = self.pygame.display.set_mode((1280, 720))
+        self.screen = self.pygame.display.set_mode(resolution)
         clock = self.pygame.time.Clock()
         dt = 0
         try:
             while True:
                 game.tick(dt, [Event(x) for x in self.pygame.event.get()])
                 self.pygame.display.flip()
-                dt = clock.tick(60)
+                dt = clock.tick(fps)
         except ExitGameLoop:
             pass
         finally:
-            self.notify("PYGAME_QUIT", {})
+            self.notify("GAMELOOP_QUIT", {})
             self.pygame.quit()
 
     def clear_screen(self):

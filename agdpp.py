@@ -17,14 +17,16 @@ class Game:
     >>> events = loop.track_events()
     >>> Game(loop).run()
     >>> events
-    PYGAME_INIT =>
+    GAMELOOP_INIT =>
+        resolution: (1280, 720)
+        fps: 60
     CLEAR_SCREEN =>
     DRAW_CIRCLE =>
         x: 50
     CLEAR_SCREEN =>
     DRAW_CIRCLE =>
         x: 51
-    PYGAME_QUIT =>
+    GAMELOOP_QUIT =>
     """
 
     def __init__(self, loop):
