@@ -6,6 +6,14 @@ import subprocess
 import sys
 import unittest
 
+def usage():
+    return [
+        "Usage:",
+        "",
+        "    ./zero.py build",
+        "    ./zero.py rundev",
+    ]
+
 if __name__ == "__main__":
     command = sys.argv[1:]
     if command == ["build"]:
@@ -24,4 +32,4 @@ if __name__ == "__main__":
     elif command == ["rundev"]:
         sys.exit(subprocess.run([sys.executable, "agdpp.py"]).returncode)
     else:
-        sys.exit(f"ERROR: Unknown command {command}.")
+        sys.exit("\n".join(usage()))
