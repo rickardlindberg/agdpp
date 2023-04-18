@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from gameloop import GameLoop
 
 class Game:
