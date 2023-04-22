@@ -3,11 +3,11 @@ from gameloop import GameLoop
 class Game:
 
     """
-    I draw an animated circle until the user closes the window.
+    I draw the initial scene of the game which consists of a balloon and an
+    arrow and quit when the user closes the window.
 
     >>> loop = GameLoop.create_null(
     ...     events=[
-    ...         [],
     ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
@@ -21,15 +21,16 @@ class Game:
     CLEAR_SCREEN =>
     DRAW_CIRCLE =>
         x: 50
-    CLEAR_SCREEN =>
     DRAW_CIRCLE =>
-        x: 51
+        x: 10
     GAMELOOP_QUIT =>
     """
 
     def __init__(self, loop):
         self.loop = loop
         self.balloon = Balloon()
+        self.arrow = Arrow()
+        self.sprites = [self.balloon, self.arrow]
 
     def run(self):
         self.loop.run(self)
@@ -38,9 +39,19 @@ class Game:
         for event in events:
             if event.is_user_closed_window():
                 self.loop.quit()
-        self.balloon.tick(dt)
+        for sprite in self.sprites:
+            sprite.tick(dt)
         self.loop.clear_screen()
-        self.balloon.draw(self.loop)
+        for sprite in self.sprites:
+            sprite.draw(self.loop)
+
+class Arrow:
+
+    def tick(self, dt):
+        pass
+
+    def draw(self, loop):
+        loop.draw_circle(10)
 
 class Balloon:
 
