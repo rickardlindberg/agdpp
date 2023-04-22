@@ -6,15 +6,12 @@ class BalloonShooter:
     I draw the initial scene of the game which consists of a balloon and an
     arrow and quit when the user closes the window.
 
-    >>> loop = GameLoop.create_null(
+    >>> BalloonShooter.run_in_test_mode(
     ...     events=[
     ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
-    >>> events = loop.track_events()
-    >>> BalloonShooter(loop).run()
-    >>> events
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
@@ -43,7 +40,7 @@ class BalloonShooter:
 
     The arrow moves when it is shot by pressing the space key:
 
-    >>> loop = GameLoop.create_null(
+    >>> events = BalloonShooter.run_in_test_mode(
     ...     events=[
     ...         [],
     ...         [GameLoop.create_event_keydown_space()],
@@ -52,8 +49,6 @@ class BalloonShooter:
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
-    >>> events = loop.track_events()
-    >>> BalloonShooter(loop).run()
     >>> arrow_positions = events.filter("DRAW_CIRCLE", radius=10).collect("x", "y")
     >>> len(arrow_positions) > 1
     True
@@ -69,6 +64,17 @@ class BalloonShooter:
     @staticmethod
     def create():
         return BalloonShooter(GameLoop.create())
+
+    @staticmethod
+    def run_in_test_mode(events=[]):
+        loop = GameLoop.create_null(
+            events=events+[
+                [GameLoop.create_event_user_closed_window()],
+            ]
+        )
+        events = loop.track_events()
+        BalloonShooter(loop).run()
+        return events
 
     def __init__(self, loop):
         self.loop = loop
