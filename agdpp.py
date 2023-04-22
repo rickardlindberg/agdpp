@@ -29,7 +29,7 @@ class Game:
 
     def __init__(self, loop):
         self.loop = loop
-        self.x = 50
+        self.balloon = Balloon()
 
     def run(self):
         self.loop.run(self)
@@ -38,12 +38,23 @@ class Game:
         for event in events:
             if event.is_user_closed_window():
                 self.loop.quit()
+        self.balloon.tick(dt)
+        self.loop.clear_screen()
+        self.balloon.draw(self.loop)
+
+class Balloon:
+
+    def __init__(self):
+        self.x = 50
+
+    def tick(self, dt):
         if self.x > 500:
             self.x = 50
         else:
             self.x += dt
-        self.loop.clear_screen()
-        self.loop.draw_circle(self.x)
+
+    def draw(self, loop):
+        loop.draw_circle(self.x)
 
 if __name__ == "__main__":
     Game(GameLoop.create()).run()
