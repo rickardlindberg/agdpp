@@ -107,9 +107,9 @@ class GameLoop(Observable):
         self.notify("CLEAR_SCREEN", {})
         self.screen.fill("purple")
 
-    def draw_circle(self, x):
-        self.notify("DRAW_CIRCLE", {"x": x})
-        self.pygame.draw.circle(self.screen, "red", (x, 50), 40)
+    def draw_circle(self, x, y=50, radius=40, color="red"):
+        self.notify("DRAW_CIRCLE", {"x": x, "y": y, "radius": radius, "color": color})
+        self.pygame.draw.circle(self.screen, color, (x, y), radius)
 
     def quit(self):
         raise ExitGameLoop()

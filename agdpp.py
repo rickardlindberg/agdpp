@@ -21,8 +21,24 @@ class Game:
     CLEAR_SCREEN =>
     DRAW_CIRCLE =>
         x: 50
+        y: 50
+        radius: 40
+        color: 'red'
     DRAW_CIRCLE =>
-        x: 10
+        x: 500
+        y: 500
+        radius: 10
+        color: 'blue'
+    DRAW_CIRCLE =>
+        x: 500
+        y: 520
+        radius: 15
+        color: 'blue'
+    DRAW_CIRCLE =>
+        x: 500
+        y: 540
+        radius: 20
+        color: 'blue'
     GAMELOOP_QUIT =>
     """
 
@@ -51,7 +67,9 @@ class Arrow:
         pass
 
     def draw(self, loop):
-        loop.draw_circle(10)
+        loop.draw_circle(x=500, y=500, color="blue", radius=10)
+        loop.draw_circle(x=500, y=520, color="blue", radius=15)
+        loop.draw_circle(x=500, y=540, color="blue", radius=20)
 
 class Balloon:
 
