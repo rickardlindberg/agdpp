@@ -1,6 +1,6 @@
 from gameloop import GameLoop
 
-class Game:
+class BalloonShooter:
 
     """
     I draw the initial scene of the game which consists of a balloon and an
@@ -13,7 +13,7 @@ class Game:
     ...     ]
     ... )
     >>> events = loop.track_events()
-    >>> Game(loop).run()
+    >>> BalloonShooter(loop).run()
     >>> events
     GAMELOOP_INIT =>
         resolution: (1280, 720)
@@ -86,4 +86,4 @@ class Balloon:
         loop.draw_circle(self.x)
 
 if __name__ == "__main__":
-    Game(GameLoop.create()).run()
+    BalloonShooter(GameLoop.create()).run()
