@@ -40,7 +40,16 @@ class BalloonShooter:
         radius: 20
         color: 'blue'
     GAMELOOP_QUIT =>
+
+    I can instantiate myself:
+
+    >>> isinstance(BalloonShooter.create(), BalloonShooter)
+    True
     """
+
+    @staticmethod
+    def create():
+        return BalloonShooter(GameLoop.create())
 
     def __init__(self, loop):
         self.loop = loop
@@ -86,4 +95,4 @@ class Balloon:
         loop.draw_circle(self.x)
 
 if __name__ == "__main__":
-    BalloonShooter(GameLoop.create()).run()
+    BalloonShooter.create().run()
