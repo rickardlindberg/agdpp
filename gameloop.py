@@ -82,6 +82,14 @@ class GameLoop(Observable):
         """
         return Event(pygame.event.Event(pygame.QUIT))
 
+    @staticmethod
+    def create_event_keydown_space():
+        """
+        >>> GameLoop.create_event_keydown_space().is_keydown_space()
+        True
+        """
+        return Event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+
     def __init__(self, pygame):
         Observable.__init__(self)
         self.pygame = pygame
@@ -121,6 +129,9 @@ class Event:
 
     def is_user_closed_window(self):
         return self.pygame_event.type == pygame.QUIT
+
+    def is_keydown_space(self):
+        return self.pygame_event.type == pygame.KEYDOWN and self.pygame_event.key == pygame.K_SPACE
 
     def __repr__(self):
         return repr(self.pygame_event)

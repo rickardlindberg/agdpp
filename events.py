@@ -27,12 +27,56 @@ class Events:
         observable.add_listener(self)
         return observable
 
-    def filter(self, filter_name):
+    def filter(self, filter_name, **fields):
+        """
+        >>> events = Events()
+        >>> events.notify("FOO", {"a": 1})
+        >>> events.notify("FOO", {"a": 2})
+        >>> events
+        FOO =>
+            a: 1
+        FOO =>
+            a: 2
+
+        I can filter on event names:
+
+        >>> events.filter("FOO")
+        FOO =>
+            a: 1
+        FOO =>
+            a: 2
+
+        I can filter on data fields:
+
+        >>> events.filter("FOO", a=1)
+        FOO =>
+            a: 1
+        """
         events = Events()
         for name, data in self.events:
             if name == filter_name:
-                events.notify(name, data)
+                for field_name, field_value in fields.items():
+                    if data.get(field_name) != field_value:
+                        break
+                else:
+                    events.notify(name, data)
         return events
+
+    def collect(self, *fields):
+        """
+        >>> events = Events()
+        >>> events.notify("FOO", {"a": 1})
+        >>> events.notify("FOO", {"a": 2})
+        >>> events.collect("a")
+        [(1,), (2,)]
+        """
+        items = []
+        for name, data in self.events:
+            item = []
+            for name in fields:
+                item.append(data.get(name))
+            items.append(tuple(item))
+        return items
 
     def __repr__(self):
         def format_event(name, data):
