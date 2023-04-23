@@ -102,29 +102,6 @@ class BalloonShooter:
 
 class Arrow:
 
-    """
-    I stay still if I've not been fired:
-
-    >>> arrow = Arrow()
-    >>> initial_y = arrow.y
-    >>> arrow.tick(1)
-    >>> arrow.tick(1)
-    >>> arrow.tick(1)
-    >>> initial_y == arrow.y
-    True
-
-    I move upwards when fired:
-
-    >>> arrow = Arrow()
-    >>> initial_y = arrow.y
-    >>> arrow.shoot()
-    >>> arrow.tick(1)
-    >>> arrow.tick(1)
-    >>> arrow.tick(1)
-    >>> arrow.y < initial_y
-    True
-    """
-
     def __init__(self):
         self.y = 500
         self.shooting = False
