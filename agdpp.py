@@ -108,7 +108,7 @@ class BalloonShooter:
                 self.loop.quit()
             elif event.is_keydown_space():
                 self.arrow.shoot()
-        self.all_sprites.tick(dt)
+        self.all_sprites.update(dt)
         self.loop.clear_screen()
         self.all_sprites.draw(self.loop)
 
@@ -121,7 +121,7 @@ class Arrow:
     def shoot(self):
         self.shooting = True
 
-    def tick(self, dt):
+    def update(self, dt):
         if self.shooting:
             self.y -= dt
 
@@ -135,7 +135,7 @@ class Balloon:
     def __init__(self):
         self.x = 50
 
-    def tick(self, dt):
+    def update(self, dt):
         if self.x > 500:
             self.x = 50
         else:

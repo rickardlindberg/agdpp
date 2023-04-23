@@ -2,17 +2,17 @@ class SpriteGroup:
 
     """
     >>> class TestSprite:
-    ...     def tick(self, dt):
-    ...         print(f"TEST SPRITE tick {dt}")
+    ...     def update(self, dt):
+    ...         print(f"TEST SPRITE update {dt}")
     ...     def draw(self, loop):
     ...         print(f"TEST SPRITE draw {loop}")
 
     >>> group = SpriteGroup([TestSprite()])
     >>> group.add(TestSprite())
 
-    >>> group.tick(4)
-    TEST SPRITE tick 4
-    TEST SPRITE tick 4
+    >>> group.update(4)
+    TEST SPRITE update 4
+    TEST SPRITE update 4
 
     >>> group.draw(None)
     TEST SPRITE draw None
@@ -27,9 +27,9 @@ class SpriteGroup:
     def add(self, sprite):
         self.sprites.append(sprite)
 
-    def tick(self, *args, **kwargs):
+    def update(self, *args, **kwargs):
         for sprite in self.sprites:
-            sprite.tick(*args, **kwargs)
+            sprite.update(*args, **kwargs)
 
     def draw(self, *args, **kwargs):
         for sprite in self.sprites:
