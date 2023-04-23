@@ -8,7 +8,10 @@ class SpriteGroup:
     ...         print(f"TEST SPRITE draw {loop}")
 
     >>> group = SpriteGroup([TestSprite()])
-    >>> group.add(TestSprite())
+    >>> x = TestSprite()
+    >>> y = group.add(x)
+    >>> x is y
+    True
 
     >>> group.update(4)
     TEST SPRITE update 4
@@ -26,6 +29,7 @@ class SpriteGroup:
 
     def add(self, sprite):
         self.sprites.append(sprite)
+        return sprite
 
     def update(self, *args, **kwargs):
         for sprite in self.sprites:

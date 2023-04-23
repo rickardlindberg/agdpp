@@ -114,10 +114,8 @@ class GameScene(SpriteGroup):
 
     def __init__(self):
         SpriteGroup.__init__(self)
-        self.balloon = Balloon()
-        self.arrow = Arrow()
-        self.add(self.balloon)
-        self.add(self.arrow)
+        self.balloon = self.add(Balloon())
+        self.arrow = self.add(Arrow())
 
     def event(self, event):
         if event.is_keydown_space():
