@@ -22,6 +22,7 @@ if __name__ == "__main__":
             "agdpp",
             "events",
             "gameloop",
+            "sprites",
         ]:
             suite.addTest(doctest.DocTestSuite(
                 importlib.import_module(module),
