@@ -96,7 +96,7 @@ class BalloonShooter:
         self.loop = loop
         self.balloon = Balloon()
         self.arrow = Arrow()
-        self.sprites = [self.balloon, self.arrow]
+        self.all_sprites = SpriteGroup([self.balloon, self.arrow])
 
     def run(self):
         self.loop.run(self)
@@ -107,11 +107,46 @@ class BalloonShooter:
                 self.loop.quit()
             elif event.is_keydown_space():
                 self.arrow.shoot()
-        for sprite in self.sprites:
-            sprite.tick(dt)
+        self.all_sprites.tick(dt)
         self.loop.clear_screen()
+        self.all_sprites.draw(self.loop)
+
+class SpriteGroup:
+
+    """
+    >>> class TestSprite:
+    ...     def tick(self, dt):
+    ...         print(f"TEST SPRITE tick {dt}")
+    ...     def draw(self, loop):
+    ...         print(f"TEST SPRITE draw {loop}")
+
+    >>> group = SpriteGroup([TestSprite()])
+    >>> group.add(TestSprite())
+
+    >>> group.tick(4)
+    TEST SPRITE tick 4
+    TEST SPRITE tick 4
+
+    >>> group.draw(None)
+    TEST SPRITE draw None
+    TEST SPRITE draw None
+    """
+
+    def __init__(self, sprites=[]):
+        self.sprites = []
+        for sprite in sprites:
+            self.add(sprite)
+
+    def add(self, sprite):
+        self.sprites.append(sprite)
+
+    def tick(self, *args, **kwargs):
         for sprite in self.sprites:
-            sprite.draw(self.loop)
+            sprite.tick(*args, **kwargs)
+
+    def draw(self, *args, **kwargs):
+        for sprite in self.sprites:
+            sprite.draw(*args, **kwargs)
 
 class Arrow:
 
