@@ -41,10 +41,15 @@ class BalloonShooter:
     >>> set(events.filter("DRAW_CIRCLE", radius=20).collect("x", "y"))
     {(500, 540)}
 
-    The arrow moves when it is shot by pressing the space key:
+    User presses space key
+    ======================
+
+    We run the game for a few frames, press the space key, let it run for a few
+    frames, then quit:
 
     >>> events = BalloonShooter.run_in_test_mode(
     ...     events=[
+    ...         [],
     ...         [],
     ...         [GameLoop.create_event_keydown_space()],
     ...         [],
@@ -52,10 +57,13 @@ class BalloonShooter:
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
-    >>> arrow_positions = events.filter("DRAW_CIRCLE", radius=10).collect("x", "y")
-    >>> len(arrow_positions) > 1
+
+    The arrow moves:
+
+    >>> arrow_head_positions = events.filter("DRAW_CIRCLE", radius=10).collect("x", "y")
+    >>> len(arrow_head_positions) > 1
     True
-    >>> len(set(arrow_positions)) > 1
+    >>> len(set(arrow_head_positions)) > 1
     True
     """
 
