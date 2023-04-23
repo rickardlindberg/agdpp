@@ -1,3 +1,4 @@
+from gameloop import ExitGameLoop
 from gameloop import GameLoop
 from sprites import SpriteGroup
 
@@ -102,10 +103,7 @@ class BalloonShooter:
 
     def tick(self, dt, events):
         for event in events:
-            if event.is_user_closed_window():
-                self.loop.quit()
-            else:
-                self.game_scene.event(event)
+            self.game_scene.event(event)
         self.game_scene.update(dt)
         self.loop.clear_screen()
         self.game_scene.draw(self.loop)
@@ -118,7 +116,9 @@ class GameScene(SpriteGroup):
         self.arrow = self.add(Arrow())
 
     def event(self, event):
-        if event.is_keydown_space():
+        if event.is_user_closed_window():
+            raise ExitGameLoop()
+        elif event.is_keydown_space():
             self.arrow.shoot()
 
 class Arrow:

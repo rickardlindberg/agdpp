@@ -119,9 +119,6 @@ class GameLoop(Observable):
         self.notify("DRAW_CIRCLE", {"x": x, "y": y, "radius": radius, "color": color})
         self.pygame.draw.circle(self.screen, color, (x, y), radius)
 
-    def quit(self):
-        raise ExitGameLoop()
-
 class Event:
 
     def __init__(self, pygame_event):
