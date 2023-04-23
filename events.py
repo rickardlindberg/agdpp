@@ -27,7 +27,7 @@ class Events:
         observable.add_listener(self)
         return observable
 
-    def filter(self, filter_name, **fields):
+    def filter(self, *filter_names, **fields):
         """
         >>> events = Events()
         >>> events.notify("FOO", {"a": 1})
@@ -54,7 +54,7 @@ class Events:
         """
         events = Events()
         for name, data in self.events:
-            if name == filter_name:
+            if name in filter_names:
                 for field_name, field_value in fields.items():
                     if data.get(field_name) != field_value:
                         break

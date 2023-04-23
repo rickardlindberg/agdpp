@@ -3,40 +3,43 @@ from gameloop import GameLoop
 class BalloonShooter:
 
     """
-    I draw the initial scene of the game which consists of a balloon and an
-    arrow and quit when the user closes the window.
+    I am a balloon shooter game!
 
-    >>> BalloonShooter.run_in_test_mode(
+    Initial state
+    =============
+
+    We run the game for a few frames, then quit:
+
+    >>> events = BalloonShooter.run_in_test_mode(
     ...     events=[
+    ...         [],
+    ...         [],
     ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
+
+    The game loop is initialized and cleaned up:
+
+    >>> events.filter("GAMELOOP_INIT", "GAMELOOP_QUIT")
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
-    CLEAR_SCREEN =>
-    DRAW_CIRCLE =>
-        x: 50
-        y: 50
-        radius: 40
-        color: 'red'
-    DRAW_CIRCLE =>
-        x: 500
-        y: 500
-        radius: 10
-        color: 'blue'
-    DRAW_CIRCLE =>
-        x: 500
-        y: 520
-        radius: 15
-        color: 'blue'
-    DRAW_CIRCLE =>
-        x: 500
-        y: 540
-        radius: 20
-        color: 'blue'
     GAMELOOP_QUIT =>
+
+    The balloon is drawn animated:
+
+    >>> events.filter("DRAW_CIRCLE", radius=40).collect("x", "y")
+    [(50, 50), (51, 50), (52, 50)]
+
+    The arrow is drawn in a fixed position:
+
+    >>> set(events.filter("DRAW_CIRCLE", radius=10).collect("x", "y"))
+    {(500, 500)}
+    >>> set(events.filter("DRAW_CIRCLE", radius=15).collect("x", "y"))
+    {(500, 520)}
+    >>> set(events.filter("DRAW_CIRCLE", radius=20).collect("x", "y"))
+    {(500, 540)}
 
     The arrow moves when it is shot by pressing the space key:
 
