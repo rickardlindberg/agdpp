@@ -57,15 +57,18 @@ class BalloonShooter:
     True
     >>> len(set(arrow_positions)) > 1
     True
-
-    I can instantiate myself:
-
-    >>> isinstance(BalloonShooter.create(), BalloonShooter)
-    True
     """
 
     @staticmethod
     def create():
+        """
+        The real BalloonShooter is not created anywhere but when we run the
+        game. This test serves to prove that it at least can be instantiated
+        without errors.
+
+        >>> isinstance(BalloonShooter.create(), BalloonShooter)
+        True
+        """
         return BalloonShooter(GameLoop.create())
 
     @staticmethod
