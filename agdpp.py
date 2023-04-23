@@ -94,7 +94,9 @@ class BalloonShooter:
 
     def __init__(self, loop):
         self.loop = loop
-        self.all_sprites = BalloonShooterSprites()
+        self.balloon = Balloon()
+        self.arrow = Arrow()
+        self.all_sprites = SpriteGroup([self.balloon, self.arrow])
 
     def run(self):
         self.loop.run(self)
@@ -103,8 +105,8 @@ class BalloonShooter:
         for event in events:
             if event.is_user_closed_window():
                 self.loop.quit()
-            else:
-                self.all_sprites.event(event)
+            elif event.is_keydown_space():
+                self.arrow.shoot()
         self.all_sprites.tick(dt)
         self.loop.clear_screen()
         self.all_sprites.draw(self.loop)
@@ -145,19 +147,6 @@ class SpriteGroup:
     def draw(self, *args, **kwargs):
         for sprite in self.sprites:
             sprite.draw(*args, **kwargs)
-
-class BalloonShooterSprites(SpriteGroup):
-
-    def __init__(self):
-        SpriteGroup.__init__(self)
-        self.balloon = Balloon()
-        self.arrow = Arrow()
-        self.add(self.balloon)
-        self.add(self.arrow)
-
-    def event(self, event):
-        if event.is_keydown_space():
-            self.arrow.shoot()
 
 class Arrow:
 
