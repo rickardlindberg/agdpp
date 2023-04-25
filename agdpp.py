@@ -96,10 +96,11 @@ class BalloonShooter:
 
     def __init__(self, loop):
         self.loop = loop
-        self.game_scene = GameScene()
+        self.resolution = (1280, 720)
+        self.game_scene = GameScene(OutsideScreenSpace(*self.resolution))
 
     def run(self):
-        self.loop.run(self)
+        self.loop.run(self, resolution=self.resolution)
 
     def tick(self, dt, events):
         for event in events:
@@ -111,12 +112,14 @@ class BalloonShooter:
 class GameScene(SpriteGroup):
 
     """
+    >>> space = OutsideScreenSpace(1280, 720)
+
     Initial state
     =============
 
     The balloon animates:
 
-    >>> game = GameScene()
+    >>> game = GameScene(space)
     >>> first_position = game.get_balloon_position()
     >>> game.update(10)
     >>> second_position = game.get_balloon_position()
@@ -125,7 +128,7 @@ class GameScene(SpriteGroup):
 
     The arrow stays still:
 
-    >>> game = GameScene()
+    >>> game = GameScene(space)
     >>> first_position = game.get_arrow_position()
     >>> game.update(10)
     >>> second_position = game.get_arrow_position()
@@ -134,14 +137,14 @@ class GameScene(SpriteGroup):
 
     It has no flying arrows:
 
-    >>> game = GameScene()
+    >>> game = GameScene(space)
     >>> game.get_flying_arrows()
     []
 
     Pressing space key
     ==================
 
-    >>> game = GameScene()
+    >>> game = GameScene(space)
     >>> initial_position = game.get_arrow_position()
     >>> game.event(GameLoop.create_event_keydown_space())
     >>> game.update(10)
@@ -158,19 +161,37 @@ class GameScene(SpriteGroup):
 
     >>> game.get_arrow_position() == initial_position
     True
+
+    Arrows flying outside screen
+    ============================
+
+    They are removed:
+
+    >>> game = GameScene(space)
+    >>> game.event(GameLoop.create_event_keydown_space())
+    >>> game.update(10000)
+    >>> game.get_flying_arrows()
+    []
     """
 
-    def __init__(self):
+    def __init__(self, space):
         SpriteGroup.__init__(self)
         self.balloon = self.add(Balloon())
         self.arrow = self.add(Arrow())
         self.flying_arrows = self.add(SpriteGroup())
+        self.space = space
 
     def event(self, event):
         if event.is_user_closed_window():
             raise ExitGameLoop()
         elif event.is_keydown_space():
             self.flying_arrows.add(Arrow(shooting=True))
+
+    def update(self, dt):
+        SpriteGroup.update(self, dt)
+        for x in self.flying_arrows.get_sprites():
+            if x.hits_space(self.space):
+                self.flying_arrows.sprites.remove(x)
 
     def get_balloon_position(self):
         return self.balloon.get_position()
@@ -181,12 +202,66 @@ class GameScene(SpriteGroup):
     def get_flying_arrows(self):
         return self.flying_arrows.get_sprites()
 
+class OutsideScreenSpace:
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def hits(self, x, y, margin):
+        """
+        >>> inside_x = 50
+        >>> inside_y = 50
+        >>> space = OutsideScreenSpace(100, 100)
+
+        To the left:
+
+        >>> space.hits(0, inside_y, 10)
+        False
+        >>> space.hits(-10, inside_y, 10)
+        True
+
+        To the right:
+
+        >>> space.hits(100, inside_y, 10)
+        False
+        >>> space.hits(110, inside_y, 10)
+        True
+
+        To the top:
+
+        >>> space.hits(inside_x, 0, 10)
+        False
+        >>> space.hits(inside_x, -10, 10)
+        True
+
+        To the bottom:
+
+        >>> space.hits(inside_x, 100, 10)
+        False
+        >>> space.hits(inside_x, 110, 10)
+        True
+        """
+        if x <= -margin:
+            return True
+        elif x >= self.width+margin:
+            return True
+        elif y <= -margin:
+            return True
+        elif y >= self.height+margin:
+            return True
+        else:
+            return False
+
 class Arrow:
 
     def __init__(self, shooting=False):
         self.x = 500
         self.y = 500
         self.shooting = shooting
+
+    def hits_space(self, space):
+        return space.hits(self.x, self.y, 20)
 
     def update(self, dt):
         if self.shooting:
