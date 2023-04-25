@@ -189,9 +189,9 @@ class GameScene(SpriteGroup):
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
-        for x in self.flying_arrows.get_sprites():
-            if x.hits_space(self.space):
-                self.flying_arrows.sprites.remove(x)
+        for arrow in self.flying_arrows.get_sprites():
+            if arrow.hits_space(self.space):
+                self.flying_arrows.sprites.remove(arrow)
 
     def get_balloon_position(self):
         return self.balloon.get_position()
