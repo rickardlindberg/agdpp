@@ -110,6 +110,29 @@ class BalloonShooter:
 
 class GameScene(SpriteGroup):
 
+    """
+    Initial state
+    =============
+
+    The balloon animates:
+
+    >>> game = GameScene()
+    >>> first_position = game.get_balloon_position()
+    >>> game.update(10)
+    >>> second_position = game.get_balloon_position()
+    >>> first_position == second_position
+    False
+
+    The arrow stays still:
+
+    >>> game = GameScene()
+    >>> first_position = game.get_arrow_position()
+    >>> game.update(10)
+    >>> second_position = game.get_arrow_position()
+    >>> first_position == second_position
+    True
+    """
+
     def __init__(self):
         SpriteGroup.__init__(self)
         self.balloon = self.add(Balloon())
@@ -121,9 +144,16 @@ class GameScene(SpriteGroup):
         elif event.is_keydown_space():
             self.arrow.shoot()
 
+    def get_balloon_position(self):
+        return self.balloon.get_position()
+
+    def get_arrow_position(self):
+        return self.arrow.get_position()
+
 class Arrow:
 
     def __init__(self):
+        self.x = 500
         self.y = 500
         self.shooting = False
 
@@ -135,14 +165,18 @@ class Arrow:
             self.y -= dt
 
     def draw(self, loop):
-        loop.draw_circle(x=500, y=self.y, color="blue", radius=10)
-        loop.draw_circle(x=500, y=self.y+20, color="blue", radius=15)
-        loop.draw_circle(x=500, y=self.y+40, color="blue", radius=20)
+        loop.draw_circle(x=self.x, y=self.y, color="blue", radius=10)
+        loop.draw_circle(x=self.x, y=self.y+20, color="blue", radius=15)
+        loop.draw_circle(x=self.x, y=self.y+40, color="blue", radius=20)
+
+    def get_position(self):
+        return (self.x, self.y)
 
 class Balloon:
 
     def __init__(self):
         self.x = 50
+        self.y = 50
 
     def update(self, dt):
         if self.x > 500:
@@ -151,7 +185,10 @@ class Balloon:
             self.x += dt
 
     def draw(self, loop):
-        loop.draw_circle(self.x)
+        loop.draw_circle(x=self.x, y=self.y)
+
+    def get_position(self):
+        return (self.x, self.y)
 
 if __name__ == "__main__":
     BalloonShooter.create().run()
