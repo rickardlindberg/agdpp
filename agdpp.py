@@ -131,18 +131,46 @@ class GameScene(SpriteGroup):
     >>> second_position = game.get_arrow_position()
     >>> first_position == second_position
     True
+
+    It has no flying arrows:
+
+    >>> game = GameScene()
+    >>> game.get_flying_arrows()
+    []
+
+    Pressing space key
+    ==================
+
+    >>> game = GameScene()
+    >>> initial_position = game.get_arrow_position()
+    >>> game.event(GameLoop.create_event_keydown_space())
+    >>> game.update(10)
+
+    It makes the arrow fire:
+
+    >>> flying = game.get_flying_arrows()
+    >>> len(flying)
+    1
+    >>> flying[0].get_position() == initial_position
+    False
+
+    The initial arrow stays the same:
+
+    >>> game.get_arrow_position() == initial_position
+    True
     """
 
     def __init__(self):
         SpriteGroup.__init__(self)
         self.balloon = self.add(Balloon())
         self.arrow = self.add(Arrow())
+        self.flying_arrows = self.add(SpriteGroup())
 
     def event(self, event):
         if event.is_user_closed_window():
             raise ExitGameLoop()
         elif event.is_keydown_space():
-            self.arrow.shoot()
+            self.flying_arrows.add(Arrow(shooting=True))
 
     def get_balloon_position(self):
         return self.balloon.get_position()
@@ -150,15 +178,15 @@ class GameScene(SpriteGroup):
     def get_arrow_position(self):
         return self.arrow.get_position()
 
+    def get_flying_arrows(self):
+        return self.flying_arrows.get_sprites()
+
 class Arrow:
 
-    def __init__(self):
+    def __init__(self, shooting=False):
         self.x = 500
         self.y = 500
-        self.shooting = False
-
-    def shoot(self):
-        self.shooting = True
+        self.shooting = shooting
 
     def update(self, dt):
         if self.shooting:

@@ -38,3 +38,6 @@ class SpriteGroup:
     def draw(self, *args, **kwargs):
         for sprite in self.sprites:
             sprite.draw(*args, **kwargs)
+
+    def get_sprites(self):
+        return self.sprites
