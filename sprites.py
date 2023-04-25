@@ -40,4 +40,7 @@ class SpriteGroup:
             sprite.draw(*args, **kwargs)
 
     def get_sprites(self):
-        return self.sprites
+        return list(self.sprites)
+
+    def remove(self, sprite):
+        self.sprites.remove(sprite)
