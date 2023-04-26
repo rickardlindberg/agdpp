@@ -163,6 +163,29 @@ class GameScene(SpriteGroup):
     >>> game.get_arrow_position() == initial_position
     True
 
+    Arrow colliding with balloon
+    ============================
+
+    >>> game = GameScene(space, balloons=[(100, 100)], arrows=[(500, 500)])
+    >>> len(game.get_balloons())
+    1
+    >>> len(game.get_flying_arrows())
+    1
+    >>> game.update(0)
+    >>> len(game.get_balloons())
+    1
+    >>> len(game.get_flying_arrows())
+    1
+
+    >>> game = GameScene(space, balloons=[(500, 500)], arrows=[(500, 500)])
+    >>> len(game.get_balloons())
+    1
+    >>> game.update(0)
+    >>> game.get_balloons()
+    []
+
+    * assert point?
+
     Arrows flying outside screen
     ============================
 
@@ -175,11 +198,15 @@ class GameScene(SpriteGroup):
     []
     """
 
-    def __init__(self, space):
+    def __init__(self, space, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
-        self.balloon = self.add(Balloon())
+        self.balloons = self.add(SpriteGroup([
+            Balloon(x=x, y=y) for (x, y) in balloons
+        ]))
         self.arrow = self.add(Arrow())
-        self.flying_arrows = self.add(SpriteGroup())
+        self.flying_arrows = self.add(SpriteGroup([
+            Arrow(x=x, y=y) for (x, y) in arrows
+        ]))
         self.space = space
 
     def event(self, event):
@@ -193,9 +220,12 @@ class GameScene(SpriteGroup):
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
                 self.flying_arrows.remove(arrow)
+            for balloon in self.balloons.get_sprites():
+                if arrow.hits_baloon(balloon):
+                    self.balloons.remove(balloon)
 
     def get_balloon_position(self):
-        return self.balloon.get_position()
+        return self.balloons.get_sprites()[0].get_position()
 
     def get_arrow_position(self):
         return self.arrow.get_position()
@@ -203,15 +233,21 @@ class GameScene(SpriteGroup):
     def get_flying_arrows(self):
         return self.flying_arrows.get_sprites()
 
+    def get_balloons(self):
+        return self.balloons.get_sprites()
+
 class Arrow:
 
-    def __init__(self, shooting=False):
-        self.x = 500
-        self.y = 500
+    def __init__(self, shooting=False, x=500, y=500):
+        self.x = x
+        self.y = y
         self.shooting = shooting
 
     def hits_space(self, space):
         return space.hits(self.x, self.y, 20)
+
+    def hits_baloon(self, balloon):
+        return balloon.inside(self.x, self.y)
 
     def update(self, dt):
         if self.shooting:
@@ -227,9 +263,20 @@ class Arrow:
 
 class Balloon:
 
-    def __init__(self):
-        self.x = 50
-        self.y = 50
+    def __init__(self, x, y, radius=40):
+        self.x = x
+        self.y = y
+        self.radius = radius
+
+    def inside(self, x, y):
+        """
+        >>> balloon = Balloon(x=50, y=50, radius=20)
+        >>> balloon.inside(50, 50)
+        True
+        >>> balloon.inside(100, 100)
+        False
+        """
+        return (x-self.x)**2+(y-self.y)**2 <= self.radius**2
 
     def update(self, dt):
         if self.x > 500:
@@ -238,7 +285,7 @@ class Balloon:
             self.x += dt
 
     def draw(self, loop):
-        loop.draw_circle(x=self.x, y=self.y)
+        loop.draw_circle(x=self.x, y=self.y, radius=self.radius)
 
     def get_position(self):
         return (self.x, self.y)
