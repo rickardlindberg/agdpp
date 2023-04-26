@@ -6,7 +6,7 @@ class OutsideScreenSpace:
         self.width = width
         self.height = height
 
-    def hits(self, x, y, margin):
+    def hits(self, position, margin):
         """
         >>> inside_x = 50
         >>> inside_y = 50
@@ -14,39 +14,39 @@ class OutsideScreenSpace:
 
         To the left:
 
-        >>> space.hits(0, inside_y, 10)
+        >>> space.hits(Point(0, inside_y), 10)
         False
-        >>> space.hits(-10, inside_y, 10)
+        >>> space.hits(Point(-10, inside_y), 10)
         True
 
         To the right:
 
-        >>> space.hits(100, inside_y, 10)
+        >>> space.hits(Point(100, inside_y), 10)
         False
-        >>> space.hits(110, inside_y, 10)
+        >>> space.hits(Point(110, inside_y), 10)
         True
 
         To the top:
 
-        >>> space.hits(inside_x, 0, 10)
+        >>> space.hits(Point(inside_x, 0), 10)
         False
-        >>> space.hits(inside_x, -10, 10)
+        >>> space.hits(Point(inside_x, -10), 10)
         True
 
         To the bottom:
 
-        >>> space.hits(inside_x, 100, 10)
+        >>> space.hits(Point(inside_x, 100), 10)
         False
-        >>> space.hits(inside_x, 110, 10)
+        >>> space.hits(Point(inside_x, 110), 10)
         True
         """
-        if x <= -margin:
+        if position.x <= -margin:
             return True
-        elif x >= self.width+margin:
+        elif position.x >= self.width+margin:
             return True
-        elif y <= -margin:
+        elif position.y <= -margin:
             return True
-        elif y >= self.height+margin:
+        elif position.y >= self.height+margin:
             return True
         else:
             return False

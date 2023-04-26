@@ -244,7 +244,7 @@ class Arrow:
         self.shooting = shooting
 
     def hits_space(self, space):
-        return space.hits(self.position.x, self.position.y, 20)
+        return space.hits(self.position, 20)
 
     def hits_baloon(self, balloon):
         return balloon.inside(self.position)
