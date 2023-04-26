@@ -247,7 +247,7 @@ class Arrow:
         return space.hits(self.position.x, self.position.y, 20)
 
     def hits_baloon(self, balloon):
-        return balloon.inside(self.position.x, self.position.y)
+        return balloon.inside(self.position)
 
     def update(self, dt):
         if self.shooting:
@@ -267,15 +267,15 @@ class Balloon:
         self.position = position
         self.radius = radius
 
-    def inside(self, x, y):
+    def inside(self, position):
         """
         >>> balloon = Balloon(Point(x=50, y=50), radius=20)
-        >>> balloon.inside(50, 50)
+        >>> balloon.inside(Point(50, 50))
         True
-        >>> balloon.inside(100, 100)
+        >>> balloon.inside(Point(100, 100))
         False
         """
-        return self.position.distance_to(Point(x, y)) <= self.radius
+        return self.position.distance_to(position) <= self.radius
 
     def update(self, dt):
         if self.position.x > 500:
