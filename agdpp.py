@@ -179,13 +179,19 @@ class GameScene(SpriteGroup):
     1
 
     >>> game = GameScene(space, balloons=[(500, 500)], arrows=[(500, 500)])
-    >>> len(game.get_balloons())
+    >>> balloons = game.get_balloons()
+    >>> len(balloons)
     1
-    >>> game.update(0)
-    >>> game.get_balloons()
+    >>> game.get_points()
     []
-
-    * assert point?
+    >>> game.update(0)
+    >>> new_balloons = game.get_balloons()
+    >>> len(new_balloons)
+    1
+    >>> new_balloons == balloons
+    False
+    >>> len(game.get_points())
+    1
 
     Arrows flying outside screen
     ============================
@@ -208,6 +214,7 @@ class GameScene(SpriteGroup):
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
         ]))
+        self.points = self.add(SpriteGroup())
         self.space = space
 
     def event(self, event):
@@ -224,6 +231,8 @@ class GameScene(SpriteGroup):
             for balloon in self.balloons.get_sprites():
                 if arrow.hits_baloon(balloon):
                     self.balloons.remove(balloon)
+                    self.balloons.add(Balloon(position=Point(x=50, y=50)))
+                    self.points.add(PointMarker(position=Point(x=700, y=50+len(self.points.get_sprites())*10)))
 
     def get_balloon_position(self):
         return self.balloons.get_sprites()[0].get_position()
@@ -236,6 +245,9 @@ class GameScene(SpriteGroup):
 
     def get_balloons(self):
         return self.balloons.get_sprites()
+
+    def get_points(self):
+        return self.points.get_sprites()
 
 class Arrow:
 
@@ -288,6 +300,17 @@ class Balloon:
 
     def get_position(self):
         return (self.position.x, self.position.y)
+
+class PointMarker:
+
+    def __init__(self, position):
+        self.position = position
+
+    def update(self, dt):
+        pass
+
+    def draw(self, loop):
+        loop.draw_circle(position=self.position, radius=5, color="yellow")
 
 if __name__ == "__main__":
     BalloonShooter.create().run()
