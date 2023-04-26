@@ -1,6 +1,7 @@
 from gameloop import ExitGameLoop
 from gameloop import GameLoop
 from geometry import OutsideScreenSpace
+from geometry import Point
 from sprites import SpriteGroup
 
 class BalloonShooter:
@@ -201,7 +202,7 @@ class GameScene(SpriteGroup):
     def __init__(self, space, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
         self.balloons = self.add(SpriteGroup([
-            Balloon(x=x, y=y) for (x, y) in balloons
+            Balloon(Point(x=x, y=y)) for (x, y) in balloons
         ]))
         self.arrow = self.add(Arrow())
         self.flying_arrows = self.add(SpriteGroup([
@@ -263,32 +264,31 @@ class Arrow:
 
 class Balloon:
 
-    def __init__(self, x, y, radius=40):
-        self.x = x
-        self.y = y
+    def __init__(self, position, radius=40):
+        self.position = position
         self.radius = radius
 
     def inside(self, x, y):
         """
-        >>> balloon = Balloon(x=50, y=50, radius=20)
+        >>> balloon = Balloon(Point(x=50, y=50), radius=20)
         >>> balloon.inside(50, 50)
         True
         >>> balloon.inside(100, 100)
         False
         """
-        return (x-self.x)**2+(y-self.y)**2 <= self.radius**2
+        return self.position.distance_to(Point(x, y)) <= self.radius
 
     def update(self, dt):
-        if self.x > 500:
-            self.x = 50
+        if self.position.x > 500:
+            self.position = self.position.set(x=50)
         else:
-            self.x += dt
+            self.position = self.position.move(dx=dt)
 
     def draw(self, loop):
-        loop.draw_circle(x=self.x, y=self.y, radius=self.radius)
+        loop.draw_circle(x=self.position.x, y=self.position.y, radius=self.radius)
 
     def get_position(self):
-        return (self.x, self.y)
+        return (self.position.x, self.position.y)
 
 if __name__ == "__main__":
     BalloonShooter.create().run()

@@ -1,3 +1,5 @@
+import math
+
 class OutsideScreenSpace:
 
     def __init__(self, width, height):
@@ -48,3 +50,39 @@ class OutsideScreenSpace:
             return True
         else:
             return False
+
+class Point:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def distance_to(self, point):
+        """
+        >>> Point(0, 0).distance_to(Point(10, 0))
+        10.0
+        """
+        return math.sqrt((point.x-self.x)**2+(point.y-self.y)**2)
+
+    def move(self, dx=0, dy=0):
+        """
+        >>> Point(0, 0).move(10, 10)
+        Point(10, 10)
+        """
+        return Point(x=self.x+dx, y=self.y+dy)
+
+    def set(self, x=None, y=None):
+        """
+        >>> Point(0, 0).set(10, 10)
+        Point(10, 10)
+
+        >>> Point(5, 5).set()
+        Point(5, 5)
+        """
+        return Point(
+            x=self.x if x is None else x,
+            y=self.y if y is None else y
+        )
+
+    def __repr__(self):
+        return f"Point({self.x}, {self.y})"
