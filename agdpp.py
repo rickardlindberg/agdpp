@@ -255,9 +255,9 @@ class Arrow:
             self.y -= dt
 
     def draw(self, loop):
-        loop.draw_circle(x=self.x, y=self.y, color="blue", radius=10)
-        loop.draw_circle(x=self.x, y=self.y+20, color="blue", radius=15)
-        loop.draw_circle(x=self.x, y=self.y+40, color="blue", radius=20)
+        loop.draw_circle(Point(x=self.x, y=self.y), color="blue", radius=10)
+        loop.draw_circle(Point(x=self.x, y=self.y+20), color="blue", radius=15)
+        loop.draw_circle(Point(x=self.x, y=self.y+40), color="blue", radius=20)
 
     def get_position(self):
         return (self.x, self.y)
@@ -285,7 +285,7 @@ class Balloon:
             self.position = self.position.move(dx=dt)
 
     def draw(self, loop):
-        loop.draw_circle(x=self.position.x, y=self.position.y, radius=self.radius)
+        loop.draw_circle(position=self.position, radius=self.radius)
 
     def get_position(self):
         return (self.position.x, self.position.y)
