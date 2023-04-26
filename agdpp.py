@@ -206,7 +206,7 @@ class GameScene(SpriteGroup):
         ]))
         self.arrow = self.add(Arrow())
         self.flying_arrows = self.add(SpriteGroup([
-            Arrow(x=x, y=y) for (x, y) in arrows
+            Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
         ]))
         self.space = space
 
@@ -239,28 +239,27 @@ class GameScene(SpriteGroup):
 
 class Arrow:
 
-    def __init__(self, shooting=False, x=500, y=500):
-        self.x = x
-        self.y = y
+    def __init__(self, shooting=False, position=Point(x=500, y=500)):
+        self.position = position
         self.shooting = shooting
 
     def hits_space(self, space):
-        return space.hits(self.x, self.y, 20)
+        return space.hits(self.position.x, self.position.y, 20)
 
     def hits_baloon(self, balloon):
-        return balloon.inside(self.x, self.y)
+        return balloon.inside(self.position.x, self.position.y)
 
     def update(self, dt):
         if self.shooting:
-            self.y -= dt
+            self.position = self.position.move(dy=-dt)
 
     def draw(self, loop):
-        loop.draw_circle(Point(x=self.x, y=self.y), color="blue", radius=10)
-        loop.draw_circle(Point(x=self.x, y=self.y+20), color="blue", radius=15)
-        loop.draw_circle(Point(x=self.x, y=self.y+40), color="blue", radius=20)
+        loop.draw_circle(self.position, color="blue", radius=10)
+        loop.draw_circle(self.position.move(dy=20), color="blue", radius=15)
+        loop.draw_circle(self.position.move(dy=40), color="blue", radius=20)
 
     def get_position(self):
-        return (self.x, self.y)
+        return (self.position.x, self.position.y)
 
 class Balloon:
 
