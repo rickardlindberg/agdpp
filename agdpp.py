@@ -221,7 +221,7 @@ class GameScene(SpriteGroup):
         if event.is_user_closed_window():
             raise ExitGameLoop()
         elif event.is_keydown_space():
-            self.flying_arrows.add(Arrow(shooting=True))
+            self.flying_arrows.add(self.arrow.clone_shooting())
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
@@ -254,6 +254,9 @@ class Arrow:
     def __init__(self, shooting=False, position=Point(x=500, y=500)):
         self.position = position
         self.shooting = shooting
+
+    def clone_shooting(self):
+        return Arrow(shooting=True, position=self.position)
 
     def hits_space(self, space):
         return space.hits(self.position, 20)
