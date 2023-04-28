@@ -57,6 +57,26 @@ class Point:
         self.x = x
         self.y = y
 
+    @staticmethod
+    def from_angle(degrees):
+        """
+        >>> p = Point.from_angle(-90)
+        >>> int(p.x)
+        0
+        >>> int(p.y)
+        -1
+
+        >>> p = Point.from_angle(0)
+        >>> int(p.x)
+        1
+        >>> int(p.y)
+        0
+        """
+        return Point(
+            x=math.cos(math.radians(degrees)),
+            y=math.sin(math.radians(degrees))
+        )
+
     def distance_to(self, point):
         """
         >>> Point(0, 0).distance_to(Point(10, 0))
@@ -77,6 +97,13 @@ class Point:
         Point(1, 6)
         """
         return self.move(dx=point.x, dy=point.y)
+
+    def times(self, magnification):
+        """
+        >>> Point(1, 5).times(2)
+        Point(2, 10)
+        """
+        return Point(x=self.x*magnification, y=self.y*magnification)
 
     def set(self, x=None, y=None):
         """

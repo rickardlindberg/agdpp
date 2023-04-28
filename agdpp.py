@@ -254,6 +254,7 @@ class Arrow:
     def __init__(self, shooting=False, position=Point(x=500, y=500)):
         self.position = position
         self.shooting = shooting
+        self.angle = -90
 
     def clone_shooting(self):
         return Arrow(shooting=True, position=self.position)
@@ -266,8 +267,7 @@ class Arrow:
 
     def update(self, dt):
         if self.shooting:
-            velocity = Point(x=0, y=-dt)
-            self.position = self.position.add(velocity)
+            self.position = self.position.add(Point.from_angle(self.angle).times(dt))
 
     def draw(self, loop):
         loop.draw_circle(self.position, color="blue", radius=10)
