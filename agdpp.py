@@ -270,9 +270,10 @@ class Arrow:
             self.position = self.position.add(Point.from_angle(self.angle).times(dt))
 
     def draw(self, loop):
+        v = Point.from_angle(self.angle + 180)
         loop.draw_circle(self.position, color="blue", radius=10)
-        loop.draw_circle(self.position.move(dy=20), color="blue", radius=15)
-        loop.draw_circle(self.position.move(dy=40), color="blue", radius=20)
+        loop.draw_circle(self.position.add(v.times(20)), color="blue", radius=15)
+        loop.draw_circle(self.position.add(v.times(40)), color="blue", radius=20)
 
     def get_position(self):
         return (self.position.x, self.position.y)
