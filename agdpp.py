@@ -193,6 +193,19 @@ class GameScene(SpriteGroup):
     >>> len(game.get_points())
     1
 
+    Changing arrow angle
+    ====================
+
+    >>> game = GameScene(space)
+    >>> game.get_arrow_angle()
+    -90
+    >>> game.event(GameLoop.create_event_keydown_left())
+    >>> game.get_arrow_angle()
+    -95
+    >>> game.event(GameLoop.create_event_keydown_right())
+    >>> game.get_arrow_angle()
+    -90
+
     Arrows flying outside screen
     ============================
 
@@ -222,6 +235,10 @@ class GameScene(SpriteGroup):
             raise ExitGameLoop()
         elif event.is_keydown_space():
             self.flying_arrows.add(self.arrow.clone_shooting())
+        elif event.is_keydown_left():
+            self.arrow.angle_left()
+        elif event.is_keydown_right():
+            self.arrow.angle_right()
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
@@ -249,15 +266,36 @@ class GameScene(SpriteGroup):
     def get_points(self):
         return self.points.get_sprites()
 
+    def get_arrow_angle(self):
+        return self.arrow.angle
+
 class Arrow:
 
-    def __init__(self, shooting=False, position=Point(x=500, y=500)):
+    def __init__(self, shooting=False, position=Point(x=500, y=500), angle=-90):
         self.position = position
         self.shooting = shooting
-        self.angle = -90
+        self.angle = angle
+
+    def angle_left(self):
+        self.angle -= 5
+
+    def angle_right(self):
+        self.angle += 5
 
     def clone_shooting(self):
-        return Arrow(shooting=True, position=self.position)
+        """
+        It preserves position and angle and set it to shooting:
+
+        >>> arrow = Arrow(position=Point(x=5, y=5), angle=-45)
+        >>> new_arrow = arrow.clone_shooting()
+        >>> new_arrow.get_position()
+        (5, 5)
+        >>> new_arrow.angle
+        -45
+        >>> new_arrow.shooting
+        True
+        """
+        return Arrow(shooting=True, position=self.position, angle=self.angle)
 
     def hits_space(self, space):
         return space.hits(self.position, 20)
