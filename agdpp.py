@@ -266,7 +266,8 @@ class Arrow:
 
     def update(self, dt):
         if self.shooting:
-            self.position = self.position.move(dy=-dt)
+            velocity = Point(x=0, y=-dt)
+            self.position = self.position.add(velocity)
 
     def draw(self, loop):
         loop.draw_circle(self.position, color="blue", radius=10)

@@ -71,6 +71,13 @@ class Point:
         """
         return Point(x=self.x+dx, y=self.y+dy)
 
+    def add(self, point):
+        """
+        >>> Point(0, 5).add(Point(1, 1))
+        Point(1, 6)
+        """
+        return self.move(dx=point.x, dy=point.y)
+
     def set(self, x=None, y=None):
         """
         >>> Point(0, 0).set(10, 10)
