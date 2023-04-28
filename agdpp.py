@@ -19,6 +19,9 @@ class BalloonShooter:
     ...         [],
     ...         [],
     ...         [],
+    ...         [],
+    ...         [],
+    ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
@@ -33,17 +36,17 @@ class BalloonShooter:
 
     The balloon is drawn animated:
 
-    >>> events.filter("DRAW_CIRCLE", radius=40).collect("x", "y")
-    [(50, 50), (51, 50), (52, 50)]
+    >>> set(events.filter("DRAW_CIRCLE", radius=40).collect("x", "y"))
+    {(50, 50), (51, 50)}
 
     The arrow is drawn in a fixed position:
 
     >>> set(events.filter("DRAW_CIRCLE", radius=10).collect("x", "y"))
-    {(500, 500)}
+    {(600, 600)}
     >>> set(events.filter("DRAW_CIRCLE", radius=15).collect("x", "y"))
-    {(500, 520)}
+    {(600, 620)}
     >>> set(events.filter("DRAW_CIRCLE", radius=20).collect("x", "y"))
-    {(500, 540)}
+    {(600, 640)}
 
     User presses space key
     ======================
@@ -249,7 +252,10 @@ class GameScene(SpriteGroup):
                 if arrow.hits_baloon(balloon):
                     self.balloons.remove(balloon)
                     self.balloons.add(Balloon(position=Point(x=50, y=50)))
-                    self.points.add(PointMarker(position=Point(x=700, y=50+len(self.points.get_sprites())*10)))
+                    self.points.add(PointMarker(position=Point(
+                        x=20+len(self.points.get_sprites())*12,
+                        y=700
+                    )))
 
     def get_balloon_position(self):
         return self.balloons.get_sprites()[0].get_position()
@@ -271,7 +277,7 @@ class GameScene(SpriteGroup):
 
 class Arrow:
 
-    def __init__(self, shooting=False, position=Point(x=500, y=500), angle=-90):
+    def __init__(self, shooting=False, position=Point(x=600, y=600), angle=-90):
         self.position = position
         self.shooting = shooting
         self.angle = angle
@@ -333,10 +339,10 @@ class Balloon:
         return self.position.distance_to(position) <= self.radius
 
     def update(self, dt):
-        if self.position.x > 500:
+        if self.position.x > 1200:
             self.position = self.position.set(x=50)
         else:
-            self.position = self.position.move(dx=dt)
+            self.position = self.position.move(dx=dt*0.3)
 
     def draw(self, loop):
         loop.draw_circle(position=self.position, radius=self.radius)
