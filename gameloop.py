@@ -107,6 +107,17 @@ class GameLoop(Observable):
         """
         return Event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
 
+    @staticmethod
+    def create_event_joystick_down(button):
+        """
+        >>> event = GameLoop.create_event_joystick_down(button=5)
+        >>> event.is_joystick_down(5)
+        True
+        >>> event.is_joystick_down(4)
+        False
+        """
+        return Event(pygame.event.Event(pygame.JOYBUTTONDOWN, button=button))
+
     def __init__(self, pygame):
         Observable.__init__(self)
         self.pygame = pygame
@@ -173,6 +184,15 @@ class Event:
 
     def is_keydown(self, key):
         return self.pygame_event.type == pygame.KEYDOWN and self.pygame_event.key == key
+
+    def is_joystick_down(self, button):
+        return (
+            self.pygame_event.type == pygame.JOYBUTTONDOWN and
+            self.pygame_event.button == button
+        )
+
+    def get_button(self):
+        return self.pygame_event.button
 
     def __repr__(self):
         return repr(self.pygame_event)

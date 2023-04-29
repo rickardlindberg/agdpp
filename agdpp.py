@@ -290,6 +290,9 @@ class InputHandler:
         >>> InputHandler().action(GameLoop.create_event_keydown_space())
         ('shoot',)
 
+        >>> InputHandler().action(GameLoop.create_event_joystick_down(0))
+        ('shoot',)
+
         >>> InputHandler().action(GameLoop.create_event_keydown_left())
         ('turn_left',)
 
@@ -298,7 +301,7 @@ class InputHandler:
         """
         if event.is_user_closed_window():
             return ('quit',)
-        elif event.is_keydown_space():
+        elif event.is_keydown_space() or event.is_joystick_down(0):
             return ('shoot',)
         elif event.is_keydown_left():
             return ('turn_left',)
