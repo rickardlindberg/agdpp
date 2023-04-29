@@ -31,10 +31,10 @@ class GameLoop(Observable):
 
     >>> game = TestGameThatNotifiesAndExitsImmediately()
     >>> events = game.track_events()
-    >>> GameLoop.create_null(events=[[Event("some event")]]).run(game)
+    >>> GameLoop.create_null(events=[[Event(pygame.event.Event(pygame.QUIT))]]).run(game)
     >>> events
     EVENT =>
-        event: 'some event'
+        event: <Event(256-Quit {})>
     TICK =>
         dt: 0
     """
@@ -117,11 +117,16 @@ class GameLoop(Observable):
         self.screen = self.pygame.display.set_mode(resolution)
         clock = self.pygame.time.Clock()
         dt = 0
+        joysticks = {}
         try:
             while True:
                 pygame_events = self.pygame.event.get()
                 for event in pygame_events:
-                    game.event(Event(event))
+                    if event.type == pygame.JOYDEVICEADDED:
+                        joy = self.pygame.joystick.Joystick(event.device_index)
+                        joysticks[joy.get_instance_id()] = joy
+                    else:
+                        game.event(Event(event))
                 game.tick(dt)
                 self.pygame.display.flip()
                 dt = clock.tick(fps)
