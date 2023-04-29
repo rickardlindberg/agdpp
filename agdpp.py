@@ -241,12 +241,11 @@ class GameScene(SpriteGroup):
         actions = {
             "quit": quit,
             "shoot": lambda: self.flying_arrows.add(self.arrow.clone_shooting()),
-            "turn_left": lambda: self.arrow.angle_left(),
-            "turn_right": lambda: self.arrow.angle_right(),
+            "set_arrow_angle": lambda angle: self.arrow.set_angle(angle),
         }
         action = self.input_handler.action(event)
         if action:
-            actions[action[0]]()
+            actions[action[0]](*action[1:])
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
@@ -282,6 +281,9 @@ class GameScene(SpriteGroup):
 
 class InputHandler:
 
+    def __init__(self):
+        self.arrow_angle = -90
+
     def action(self, event):
         """
         >>> InputHandler().action(GameLoop.create_event_user_closed_window())
@@ -294,19 +296,21 @@ class InputHandler:
         ('shoot',)
 
         >>> InputHandler().action(GameLoop.create_event_keydown_left())
-        ('turn_left',)
+        ('set_arrow_angle', -95)
 
         >>> InputHandler().action(GameLoop.create_event_keydown_right())
-        ('turn_right',)
+        ('set_arrow_angle', -85)
         """
         if event.is_user_closed_window():
             return ('quit',)
         elif event.is_keydown_space() or event.is_joystick_down(0):
             return ('shoot',)
         elif event.is_keydown_left():
-            return ('turn_left',)
+            self.arrow_angle -= 5
+            return ('set_arrow_angle', self.arrow_angle)
         elif event.is_keydown_right():
-            return ('turn_right',)
+            self.arrow_angle += 5
+            return ('set_arrow_angle', self.arrow_angle)
 
 class Arrow:
 
@@ -315,11 +319,8 @@ class Arrow:
         self.shooting = shooting
         self.angle = angle
 
-    def angle_left(self):
-        self.angle -= 5
-
-    def angle_right(self):
-        self.angle += 5
+    def set_angle(self, angle):
+        self.angle = angle
 
     def clone_shooting(self):
         """
