@@ -224,6 +224,7 @@ class GameScene(SpriteGroup):
 
     def __init__(self, space, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
+        self.input_handler = InputHandler()
         self.balloons = self.add(SpriteGroup([
             Balloon(Point(x=x, y=y)) for (x, y) in balloons
         ]))
@@ -235,14 +236,17 @@ class GameScene(SpriteGroup):
         self.space = space
 
     def event(self, event):
-        if event.is_user_closed_window():
+        def quit():
             raise ExitGameLoop()
-        elif event.is_keydown_space():
-            self.flying_arrows.add(self.arrow.clone_shooting())
-        elif event.is_keydown_left():
-            self.arrow.angle_left()
-        elif event.is_keydown_right():
-            self.arrow.angle_right()
+        actions = {
+            "quit": quit,
+            "shoot": lambda: self.flying_arrows.add(self.arrow.clone_shooting()),
+            "turn_left": lambda: self.arrow.angle_left(),
+            "turn_right": lambda: self.arrow.angle_right(),
+        }
+        action = self.input_handler.action(event)
+        if action:
+            actions[action[0]]()
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
@@ -275,6 +279,31 @@ class GameScene(SpriteGroup):
 
     def get_arrow_angle(self):
         return self.arrow.angle
+
+class InputHandler:
+
+    def action(self, event):
+        """
+        >>> InputHandler().action(GameLoop.create_event_user_closed_window())
+        ('quit',)
+
+        >>> InputHandler().action(GameLoop.create_event_keydown_space())
+        ('shoot',)
+
+        >>> InputHandler().action(GameLoop.create_event_keydown_left())
+        ('turn_left',)
+
+        >>> InputHandler().action(GameLoop.create_event_keydown_right())
+        ('turn_right',)
+        """
+        if event.is_user_closed_window():
+            return ('quit',)
+        elif event.is_keydown_space():
+            return ('shoot',)
+        elif event.is_keydown_left():
+            return ('turn_left',)
+        elif event.is_keydown_right():
+            return ('turn_right',)
 
 class Arrow:
 
