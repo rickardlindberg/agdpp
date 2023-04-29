@@ -107,9 +107,10 @@ class BalloonShooter:
     def run(self):
         self.loop.run(self, resolution=self.resolution)
 
-    def tick(self, dt, events):
-        for event in events:
-            self.game_scene.event(event)
+    def event(self, event):
+        self.game_scene.event(event)
+
+    def tick(self, dt):
         self.game_scene.update(dt)
         self.loop.clear_screen()
         self.game_scene.draw(self.loop)

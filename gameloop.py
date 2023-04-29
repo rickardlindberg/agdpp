@@ -33,9 +33,10 @@ class GameLoop(Observable):
     >>> events = game.track_events()
     >>> GameLoop.create_null(events=[[Event("some event")]]).run(game)
     >>> events
+    EVENT =>
+        event: 'some event'
     TICK =>
         dt: 0
-        events: ['some event']
     """
 
     @staticmethod
@@ -118,7 +119,10 @@ class GameLoop(Observable):
         dt = 0
         try:
             while True:
-                game.tick(dt, [Event(x) for x in self.pygame.event.get()])
+                pygame_events = self.pygame.event.get()
+                for event in pygame_events:
+                    game.event(Event(event))
+                game.tick(dt)
                 self.pygame.display.flip()
                 dt = clock.tick(fps)
         except ExitGameLoop:
@@ -173,6 +177,9 @@ class ExitGameLoop(Exception):
 
 class TestGameThatNotifiesAndExitsImmediately(Observable):
 
-    def tick(self, dt, events):
-        self.notify("TICK", {"dt": dt, "events": events})
+    def event(self, event):
+        self.notify("EVENT", {"event": event})
+
+    def tick(self, dt):
+        self.notify("TICK", {"dt": dt})
         raise ExitGameLoop()
