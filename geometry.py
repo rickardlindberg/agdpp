@@ -98,6 +98,16 @@ class Point:
             y=self.y if y is None else y
         )
 
+    def to_angle(self):
+        """
+        >>> Point(0, -1).to_angle()
+        Angle(-90.0)
+
+        >>> Point(1, 0).to_angle()
+        Angle(0.0)
+        """
+        return Angle(math.degrees(math.atan2(self.y, self.x)))
+
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
 
@@ -111,6 +121,10 @@ class Angle:
         self.degrees = degrees
 
     def to_unit_point(self):
+        """
+        >>> Angle.up().to_unit_point()
+        Point(6.123233995736766e-17, -1.0)
+        """
         return Point(
             x=math.cos(math.radians(self.degrees)),
             y=math.sin(math.radians(self.degrees))
