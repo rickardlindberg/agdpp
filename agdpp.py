@@ -1,5 +1,9 @@
 from gameloop import ExitGameLoop
 from gameloop import GameLoop
+from gameloop import KEY_LEFT
+from gameloop import KEY_RIGHT
+from gameloop import KEY_SPACE
+from gameloop import XBOX_A
 from geometry import OutsideScreenSpace
 from geometry import Point
 from sprites import SpriteGroup
@@ -58,7 +62,7 @@ class BalloonShooter:
     ...     events=[
     ...         [],
     ...         [],
-    ...         [GameLoop.create_event_keydown_space()],
+    ...         [GameLoop.create_event_keydown(KEY_SPACE)],
     ...         [],
     ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
@@ -152,7 +156,7 @@ class GameScene(SpriteGroup):
 
     >>> game = GameScene(space)
     >>> initial_position = game.get_arrow_position()
-    >>> game.event(GameLoop.create_event_keydown_space())
+    >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10)
 
     It makes the arrow fire:
@@ -203,10 +207,10 @@ class GameScene(SpriteGroup):
     >>> game = GameScene(space)
     >>> game.get_arrow_angle()
     -90
-    >>> game.event(GameLoop.create_event_keydown_left())
+    >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.get_arrow_angle()
     -95
-    >>> game.event(GameLoop.create_event_keydown_right())
+    >>> game.event(GameLoop.create_event_keydown(KEY_RIGHT))
     >>> game.get_arrow_angle()
     -90
 
@@ -216,7 +220,7 @@ class GameScene(SpriteGroup):
     They are removed:
 
     >>> game = GameScene(space)
-    >>> game.event(GameLoop.create_event_keydown_space())
+    >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10000)
     >>> game.get_flying_arrows()
     []
@@ -289,21 +293,21 @@ class InputHandler:
         >>> InputHandler().action(GameLoop.create_event_user_closed_window())
         ('quit',)
 
-        >>> InputHandler().action(GameLoop.create_event_keydown_space())
+        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_SPACE))
         ('shoot',)
 
-        >>> InputHandler().action(GameLoop.create_event_joystick_down(0))
+        >>> InputHandler().action(GameLoop.create_event_joystick_down(XBOX_A))
         ('shoot',)
 
-        >>> InputHandler().action(GameLoop.create_event_keydown_left())
+        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_LEFT))
         ('set_arrow_angle', -95)
 
-        >>> InputHandler().action(GameLoop.create_event_keydown_right())
+        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_RIGHT))
         ('set_arrow_angle', -85)
         """
         if event.is_user_closed_window():
             return ('quit',)
-        elif event.is_keydown_space() or event.is_joystick_down(0):
+        elif event.is_keydown_space() or event.is_joystick_down(XBOX_A):
             return ('shoot',)
         elif event.is_keydown_left():
             self.arrow_angle -= 5

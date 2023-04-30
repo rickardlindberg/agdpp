@@ -2,6 +2,11 @@ from events import Observable
 
 import pygame
 
+KEY_SPACE = pygame.K_SPACE
+KEY_LEFT = pygame.K_LEFT
+KEY_RIGHT = pygame.K_RIGHT
+XBOX_A = 0
+
 class GameLoop(Observable):
 
     """
@@ -84,28 +89,12 @@ class GameLoop(Observable):
         return Event(pygame.event.Event(pygame.QUIT))
 
     @staticmethod
-    def create_event_keydown_space():
+    def create_event_keydown(key):
         """
-        >>> GameLoop.create_event_keydown_space().is_keydown_space()
+        >>> GameLoop.create_event_keydown(KEY_LEFT).is_keydown(KEY_LEFT)
         True
         """
-        return Event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
-
-    @staticmethod
-    def create_event_keydown_left():
-        """
-        >>> GameLoop.create_event_keydown_left().is_keydown_left()
-        True
-        """
-        return Event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
-
-    @staticmethod
-    def create_event_keydown_right():
-        """
-        >>> GameLoop.create_event_keydown_right().is_keydown_right()
-        True
-        """
-        return Event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+        return Event(pygame.event.Event(pygame.KEYDOWN, key=key))
 
     @staticmethod
     def create_event_joystick_down(button):
