@@ -147,12 +147,14 @@ class GameLoop(Observable):
             "radius": radius,
             "color": color,
         })
-        self.pygame.draw.circle(
-            self.screen,
-            color,
-            (int(position.x), int(position.y)),
-            radius
-        )
+        if position.x >= 0:
+            # https://github.com/pygame/pygame/issues/3778
+            self.pygame.draw.circle(
+                self.screen,
+                color,
+                (int(position.x), int(position.y)),
+                radius
+            )
 
 class Event:
 
