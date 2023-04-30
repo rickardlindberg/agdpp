@@ -4,6 +4,7 @@ from gameloop import KEY_LEFT
 from gameloop import KEY_RIGHT
 from gameloop import KEY_SPACE
 from gameloop import XBOX_A
+from geometry import Angle
 from geometry import OutsideScreenSpace
 from geometry import Point
 from sprites import SpriteGroup
@@ -206,13 +207,13 @@ class GameScene(SpriteGroup):
 
     >>> game = GameScene(space)
     >>> game.get_arrow_angle()
-    -90
+    Angle(-90)
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.get_arrow_angle()
-    -95
+    Angle(-95.0)
     >>> game.event(GameLoop.create_event_keydown(KEY_RIGHT))
     >>> game.get_arrow_angle()
-    -90
+    Angle(-90.0)
 
     Arrows flying outside screen
     ============================
@@ -286,7 +287,7 @@ class GameScene(SpriteGroup):
 class InputHandler:
 
     def __init__(self):
-        self.arrow_angle = -90
+        self.arrow_angle = Angle.up()
 
     def action(self, event):
         """
@@ -300,25 +301,25 @@ class InputHandler:
         ('shoot',)
 
         >>> InputHandler().action(GameLoop.create_event_keydown(KEY_LEFT))
-        ('set_arrow_angle', -95)
+        ('set_arrow_angle', Angle(-95.0))
 
         >>> InputHandler().action(GameLoop.create_event_keydown(KEY_RIGHT))
-        ('set_arrow_angle', -85)
+        ('set_arrow_angle', Angle(-85.0))
         """
         if event.is_user_closed_window():
             return ('quit',)
         elif event.is_keydown_space() or event.is_joystick_down(XBOX_A):
             return ('shoot',)
         elif event.is_keydown_left():
-            self.arrow_angle -= 5
+            self.arrow_angle = self.arrow_angle.add(-5/360)
             return ('set_arrow_angle', self.arrow_angle)
         elif event.is_keydown_right():
-            self.arrow_angle += 5
+            self.arrow_angle = self.arrow_angle.add(5/360)
             return ('set_arrow_angle', self.arrow_angle)
 
 class Arrow:
 
-    def __init__(self, shooting=False, position=Point(x=600, y=600), angle=-90):
+    def __init__(self, shooting=False, position=Point(x=600, y=600), angle=Angle.up()):
         self.position = position
         self.shooting = shooting
         self.angle = angle
@@ -349,10 +350,10 @@ class Arrow:
 
     def update(self, dt):
         if self.shooting:
-            self.position = self.position.add(Point.from_angle(self.angle).times(dt))
+            self.position = self.position.add(self.angle.to_unit_point().times(dt))
 
     def draw(self, loop):
-        v = Point.from_angle(self.angle + 180)
+        v = self.angle.add(180/360).to_unit_point()
         loop.draw_circle(self.position, color="blue", radius=10)
         loop.draw_circle(self.position.add(v.times(20)), color="blue", radius=15)
         loop.draw_circle(self.position.add(v.times(40)), color="blue", radius=20)

@@ -57,26 +57,6 @@ class Point:
         self.x = x
         self.y = y
 
-    @staticmethod
-    def from_angle(degrees):
-        """
-        >>> p = Point.from_angle(-90)
-        >>> int(p.x)
-        0
-        >>> int(p.y)
-        -1
-
-        >>> p = Point.from_angle(0)
-        >>> int(p.x)
-        1
-        >>> int(p.y)
-        0
-        """
-        return Point(
-            x=math.cos(math.radians(degrees)),
-            y=math.sin(math.radians(degrees))
-        )
-
     def distance_to(self, point):
         """
         >>> Point(0, 0).distance_to(Point(10, 0))
@@ -120,3 +100,24 @@ class Point:
 
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
+
+class Angle:
+
+    @staticmethod
+    def up():
+        return Angle(-90)
+
+    def __init__(self, degrees):
+        self.degrees = degrees
+
+    def to_unit_point(self):
+        return Point(
+            x=math.cos(math.radians(self.degrees)),
+            y=math.sin(math.radians(self.degrees))
+        )
+
+    def add(self, fraction_of_round):
+        return Angle(self.degrees + 360 * fraction_of_round)
+
+    def __repr__(self):
+        return f"Angle({self.degrees})"
