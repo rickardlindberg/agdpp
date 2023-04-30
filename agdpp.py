@@ -288,6 +288,7 @@ class InputHandler:
 
     def __init__(self):
         self.arrow_angle = Angle.up()
+        self.joy_point = Point(x=0, y=0)
 
     def action(self, event):
         """
@@ -305,6 +306,12 @@ class InputHandler:
 
         >>> InputHandler().action(GameLoop.create_event_keydown(KEY_RIGHT))
         ('set_arrow_angle', Angle(-85.0))
+
+        >>> i = InputHandler()
+        >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=0.5))
+        ('set_arrow_angle', Angle(0.0))
+        >>> i.action(GameLoop.create_event_joystick_motion(axis=1, value=-0.5))
+        ('set_arrow_angle', Angle(-45.0))
         """
         if event.is_user_closed_window():
             return ('quit',)
@@ -315,6 +322,13 @@ class InputHandler:
             return ('set_arrow_angle', self.arrow_angle)
         elif event.is_keydown_right():
             self.arrow_angle = self.arrow_angle.add(5/360)
+            return ('set_arrow_angle', self.arrow_angle)
+        elif event.is_joystick_motion():
+            if event.get_axis() == 0 and abs(event.get_value()) > 0.1:
+                self.joy_point = self.joy_point.set(x=event.get_value())
+            elif event.get_axis() == 1 and abs(event.get_value()) > 0.1:
+                self.joy_point = self.joy_point.set(y=event.get_value())
+            self.arrow_angle = self.joy_point.to_angle()
             return ('set_arrow_angle', self.arrow_angle)
 
 class Arrow:

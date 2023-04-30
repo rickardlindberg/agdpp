@@ -107,6 +107,19 @@ class GameLoop(Observable):
         """
         return Event(pygame.event.Event(pygame.JOYBUTTONDOWN, button=button))
 
+    @staticmethod
+    def create_event_joystick_motion(axis, value):
+        """
+        >>> event = GameLoop.create_event_joystick_motion(axis=0, value=0.5)
+        >>> event.is_joystick_motion()
+        True
+        >>> event.get_axis()
+        0
+        >>> event.get_value()
+        0.5
+        """
+        return Event(pygame.event.Event(pygame.JOYAXISMOTION, axis=axis, value=value))
+
     def __init__(self, pygame):
         Observable.__init__(self)
         self.pygame = pygame
@@ -184,6 +197,15 @@ class Event:
 
     def get_button(self):
         return self.pygame_event.button
+
+    def is_joystick_motion(self):
+        return self.pygame_event.type == pygame.JOYAXISMOTION
+
+    def get_axis(self):
+        return self.pygame_event.axis
+
+    def get_value(self):
+        return self.pygame_event.value
 
     def __repr__(self):
         return repr(self.pygame_event)
