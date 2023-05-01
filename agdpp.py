@@ -246,10 +246,9 @@ class GameScene(SpriteGroup):
         self.space = space
 
     def event(self, event):
-        def quit():
+        if event.is_user_closed_window():
             raise ExitGameLoop()
         actions = {
-            "quit": quit,
             "shoot": lambda: self.flying_arrows.add(self.arrow.clone_shooting()),
             "set_arrow_angle": lambda angle: self.arrow.set_angle(angle),
         }
@@ -294,9 +293,6 @@ class InputHandler:
 
     def action(self, event):
         """
-        >>> InputHandler().action(GameLoop.create_event_user_closed_window())
-        ('quit',)
-
         >>> InputHandler().action(GameLoop.create_event_keydown(KEY_SPACE))
         ('shoot',)
 
@@ -315,9 +311,7 @@ class InputHandler:
         >>> i.action(GameLoop.create_event_joystick_motion(axis=1, value=-0.5))
         ('set_arrow_angle', Angle(-45.0))
         """
-        if event.is_user_closed_window():
-            return ('quit',)
-        elif event.is_keydown_space() or event.is_joystick_down(XBOX_A):
+        if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
             return ('shoot',)
         elif event.is_keydown_left():
             self.arrow_angle = self.arrow_angle.add(-5/360)
