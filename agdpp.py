@@ -214,9 +214,11 @@ class GameScene(SpriteGroup):
     >>> game.get_arrow_angle()
     Angle(-90)
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
+    >>> game.update(0)
     >>> game.get_arrow_angle()
     Angle(-95.0)
     >>> game.event(GameLoop.create_event_keydown(KEY_RIGHT))
+    >>> game.update(0)
     >>> game.get_arrow_angle()
     Angle(-90.0)
 
@@ -259,6 +261,7 @@ class GameScene(SpriteGroup):
         actions = self.input_handler.pop()
         for shot in actions["shots"]:
             self.flying_arrows.add(self.arrow.clone_shooting())
+        self.arrow.set_angle(actions["arrow_angle"])
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
@@ -299,6 +302,7 @@ class InputHandler:
 
     def pop(self):
         actions = self.actions
+        actions["arrow_angle"] = self.arrow_angle
         self.empty_actions()
         return actions
 
@@ -313,35 +317,20 @@ class InputHandler:
         [1, 1]
         >>> i.pop()["shots"]
         []
-
-        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_LEFT))
-        ('set_arrow_angle', Angle(-95.0))
-
-        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_RIGHT))
-        ('set_arrow_angle', Angle(-85.0))
-
-        >>> i = InputHandler()
-        >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=0.5))
-        ('set_arrow_angle', Angle(0.0))
-        >>> i.action(GameLoop.create_event_joystick_motion(axis=1, value=-0.5))
-        ('set_arrow_angle', Angle(-45.0))
         """
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
             self.actions["shots"].append(1)
             return None
         elif event.is_keydown_left():
             self.arrow_angle = self.arrow_angle.add(-5/360)
-            return ('set_arrow_angle', self.arrow_angle)
         elif event.is_keydown_right():
             self.arrow_angle = self.arrow_angle.add(5/360)
-            return ('set_arrow_angle', self.arrow_angle)
         elif event.is_joystick_motion():
             if event.get_axis() == 0 and abs(event.get_value()) > 0.1:
                 self.joy_point = self.joy_point.set(x=event.get_value())
             elif event.get_axis() == 1 and abs(event.get_value()) > 0.1:
                 self.joy_point = self.joy_point.set(y=event.get_value())
             self.arrow_angle = self.joy_point.to_angle()
-            return ('set_arrow_angle', self.arrow_angle)
 
 class Arrow:
 
