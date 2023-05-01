@@ -249,7 +249,6 @@ class GameScene(SpriteGroup):
         if event.is_user_closed_window():
             raise ExitGameLoop()
         actions = {
-            "shoot": lambda: self.flying_arrows.add(self.arrow.clone_shooting()),
             "set_arrow_angle": lambda angle: self.arrow.set_angle(angle),
         }
         action = self.input_handler.action(event)
@@ -257,6 +256,9 @@ class GameScene(SpriteGroup):
             actions[action[0]](*action[1:])
 
     def update(self, dt):
+        x = self.input_handler.pop()
+        for shot in x["shots"]:
+            self.flying_arrows.add(self.arrow.clone_shooting())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
@@ -290,14 +292,24 @@ class InputHandler:
     def __init__(self):
         self.arrow_angle = Angle.up()
         self.joy_point = Point(x=0, y=0)
+        self.foo = {"shots": []}
+
+    def pop(self):
+        x = self.foo
+        self.foo = {"shots": []}
+        return x
 
     def action(self, event):
         """
-        >>> InputHandler().action(GameLoop.create_event_keydown(KEY_SPACE))
-        ('shoot',)
+        Space and Xbox A adds a shot:
 
-        >>> InputHandler().action(GameLoop.create_event_joystick_down(XBOX_A))
-        ('shoot',)
+        >>> i = InputHandler()
+        >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
+        >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
+        >>> i.pop()["shots"]
+        [1, 1]
+        >>> i.pop()["shots"]
+        []
 
         >>> InputHandler().action(GameLoop.create_event_keydown(KEY_LEFT))
         ('set_arrow_angle', Angle(-95.0))
@@ -312,7 +324,8 @@ class InputHandler:
         ('set_arrow_angle', Angle(-45.0))
         """
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
-            return ('shoot',)
+            self.foo["shots"].append(1)
+            return None
         elif event.is_keydown_left():
             self.arrow_angle = self.arrow_angle.add(-5/360)
             return ('set_arrow_angle', self.arrow_angle)
