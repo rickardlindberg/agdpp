@@ -53,6 +53,11 @@ class BalloonShooter:
     >>> set(events.filter("DRAW_CIRCLE", radius=20).collect("x", "y"))
     {(600, 640)}
 
+    The score is drawn:
+
+    >>> set(events.filter("DRAW_TEXT").collect("text"))
+    {('0',)}
+
     User presses space key
     ======================
 
@@ -191,15 +196,15 @@ class GameScene(SpriteGroup):
     >>> balloons = game.get_balloons()
     >>> len(balloons)
     1
-    >>> game.get_points()
-    []
+    >>> game.get_score()
+    0
     >>> game.update(0)
     >>> new_balloons = game.get_balloons()
     >>> len(new_balloons)
     1
     >>> new_balloons == balloons
     False
-    >>> len(game.get_points())
+    >>> game.get_score()
     1
 
     Changing arrow angle
@@ -237,7 +242,7 @@ class GameScene(SpriteGroup):
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
         ]))
-        self.points = self.add(SpriteGroup())
+        self.score = self.add(Score())
         self.space = space
 
     def event(self, event):
@@ -261,10 +266,7 @@ class GameScene(SpriteGroup):
                 if arrow.hits_baloon(balloon):
                     self.balloons.remove(balloon)
                     self.balloons.add(Balloon(position=Point(x=50, y=50)))
-                    self.points.add(PointMarker(position=Point(
-                        x=20+len(self.points.get_sprites())*12,
-                        y=700
-                    )))
+                    self.score.add(1)
 
     def get_balloon_position(self):
         return self.balloons.get_sprites()[0].get_position()
@@ -278,8 +280,8 @@ class GameScene(SpriteGroup):
     def get_balloons(self):
         return self.balloons.get_sprites()
 
-    def get_points(self):
-        return self.points.get_sprites()
+    def get_score(self):
+        return self.score.score
 
     def get_arrow_angle(self):
         return self.arrow.angle
@@ -403,16 +405,19 @@ class Balloon:
     def get_position(self):
         return (self.position.x, self.position.y)
 
-class PointMarker:
+class Score:
 
-    def __init__(self, position):
-        self.position = position
+    def __init__(self):
+        self.score = 0
+
+    def add(self, points):
+        self.score += points
 
     def update(self, dt):
         pass
 
     def draw(self, loop):
-        loop.draw_circle(position=self.position, radius=5, color="yellow")
+        loop.draw_text(position=Point(x=1100, y=20), text=str(self.score))
 
 if __name__ == "__main__":
     BalloonShooter.create().run()

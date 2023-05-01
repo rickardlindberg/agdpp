@@ -56,8 +56,18 @@ class GameLoop(Observable):
                 self.draw = NullDraw()
                 self.event = NullEvent()
                 self.time = NullTime()
+                self.font = NullFontModule()
             def quit(self):
                 pass
+        class NullFont:
+            def __init__(self, size):
+                pass
+            def render(self, text, antialiased, color):
+                pass
+        class NullFontModule:
+            Font = NullFont
+            def get_default_font(self):
+                return NullFont()
         class NullDisplay:
             def set_mode(self, resolution):
                 return NullScreen()
@@ -65,6 +75,8 @@ class GameLoop(Observable):
                 pass
         class NullScreen:
             def fill(self, color):
+                pass
+            def blit(self, surface, destination):
                 pass
         class NullDraw:
             def circle(self, screen, color, position, radius):
@@ -168,6 +180,16 @@ class GameLoop(Observable):
                 (int(position.x), int(position.y)),
                 radius
             )
+
+    def draw_text(self, position, text):
+        self.notify("DRAW_TEXT", {
+            "x": position.x,
+            "y": position.y,
+            "text": text,
+        })
+        f = self.pygame.font.Font(size=100)
+        surface = f.render(text, True, "black")
+        self.screen.blit(surface, (position.x, position.y))
 
 class Event:
 
