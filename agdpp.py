@@ -256,8 +256,8 @@ class GameScene(SpriteGroup):
             actions[action[0]](*action[1:])
 
     def update(self, dt):
-        x = self.input_handler.pop()
-        for shot in x["shots"]:
+        actions = self.input_handler.pop()
+        for shot in actions["shots"]:
             self.flying_arrows.add(self.arrow.clone_shooting())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
@@ -292,12 +292,15 @@ class InputHandler:
     def __init__(self):
         self.arrow_angle = Angle.up()
         self.joy_point = Point(x=0, y=0)
-        self.foo = {"shots": []}
+        self.empty_actions()
+
+    def empty_actions(self):
+        self.actions = {"shots": []}
 
     def pop(self):
-        x = self.foo
-        self.foo = {"shots": []}
-        return x
+        actions = self.actions
+        self.empty_actions()
+        return actions
 
     def action(self, event):
         """
@@ -324,7 +327,7 @@ class InputHandler:
         ('set_arrow_angle', Angle(-45.0))
         """
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
-            self.foo["shots"].append(1)
+            self.actions["shots"].append(1)
             return None
         elif event.is_keydown_left():
             self.arrow_angle = self.arrow_angle.add(-5/360)
