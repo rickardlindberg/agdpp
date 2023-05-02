@@ -258,7 +258,7 @@ class GameScene(SpriteGroup):
             actions[action[0]](*action[1:])
 
     def update(self, dt):
-        actions = self.input_handler.pop()
+        actions = self.input_handler.pop(dt)
         for shot in actions["shots"]:
             self.flying_arrows.add(self.arrow.clone_shooting())
         self.arrow.set_angle(actions["arrow_angle"])
@@ -292,32 +292,55 @@ class GameScene(SpriteGroup):
 
 class InputHandler:
 
+    """
+    Space and Xbox A adds a shot:
+
+    >>> i = InputHandler()
+    >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
+    >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> i.pop(1)["shots"]
+    [1, 1]
+    >>> i.pop(1)["shots"]
+    []
+
+    >>> i = InputHandler()
+    >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-95.0)
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-95.0)
+
+    >>> i = InputHandler()
+    >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-85.0)
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-85.0)
+
+    >>> i = InputHandler()
+    >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-89.82)
+    >>> i.pop(1)["arrow_angle"]
+    Angle(-89.63999999999999)
+    """
+
     def __init__(self):
         self.arrow_angle = Angle.up()
-        self.joy_point = Point(x=0, y=0)
+        self.delta = 0
         self.empty_actions()
 
     def empty_actions(self):
         self.actions = {"shots": []}
 
-    def pop(self):
+    def pop(self, dt):
         actions = self.actions
+        self.arrow_angle = self.arrow_angle.add(dt*self.delta*1/2000)
         actions["arrow_angle"] = self.arrow_angle
         self.empty_actions()
         return actions
 
     def action(self, event):
-        """
-        Space and Xbox A adds a shot:
-
-        >>> i = InputHandler()
-        >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
-        >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
-        >>> i.pop()["shots"]
-        [1, 1]
-        >>> i.pop()["shots"]
-        []
-        """
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
             self.actions["shots"].append(1)
             return None
@@ -325,12 +348,11 @@ class InputHandler:
             self.arrow_angle = self.arrow_angle.add(-5/360)
         elif event.is_keydown_right():
             self.arrow_angle = self.arrow_angle.add(5/360)
-        elif event.is_joystick_motion():
-            if event.get_axis() == 0 and abs(event.get_value()) > 0.1:
-                self.joy_point = self.joy_point.set(x=event.get_value())
-            elif event.get_axis() == 1 and abs(event.get_value()) > 0.1:
-                self.joy_point = self.joy_point.set(y=event.get_value())
-            self.arrow_angle = self.joy_point.to_angle()
+        elif event.is_joystick_motion() and event.get_axis() == 0:
+            if abs(event.get_value()) > 0.01:
+                self.delta = event.get_value()
+            else:
+                self.delta = 0
 
 class Arrow:
 
