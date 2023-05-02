@@ -426,7 +426,17 @@ class Bow(SpriteGroup):
         self.arrow = self.add(Arrow())
 
     def turn(self, angle):
-        self.arrow.set_angle(self.arrow.angle.add(angle))
+        """
+        >>> bow = Bow()
+        >>> bow.get_angle()
+        Angle(-90)
+        >>> bow.turn(Angle.fraction_of_whole(0.5))
+        >>> bow.get_angle()
+        Angle(-90)
+        """
+        new_angle = self.arrow.angle.add(angle)
+        if new_angle.to_unit_point().y < 0:
+            self.arrow.set_angle(new_angle)
 
     def get_angle(self):
         return self.arrow.angle
