@@ -256,7 +256,7 @@ class GameScene(SpriteGroup):
     def update(self, dt):
         self.input_handler.update(dt)
         if self.input_handler.get_shoot():
-            self.flying_arrows.add(self.bow.clone_shooting())
+            self.flying_arrows.add(self.bow.shoot())
         self.bow.turn(self.input_handler.get_turn_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
@@ -412,7 +412,7 @@ class Bow(SpriteGroup):
     def get_position(self):
         return self.arrow.get_position()
 
-    def clone_shooting(self):
+    def shoot(self):
         return self.arrow.clone_shooting()
 
 class Arrow:
