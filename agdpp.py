@@ -399,15 +399,12 @@ class Bow(SpriteGroup):
         >>> bow.get_angle()
         Angle(-90)
         """
-        new_angle = self.arrow.angle.add(angle)
+        new_angle = self.get_angle().add(angle)
         if new_angle.to_unit_point().y < 0:
             self.arrow.set_angle(new_angle)
 
     def get_angle(self):
         return self.arrow.get_angle()
-
-    def set_angle(self, angle):
-        self.arrow.set_angle(angle)
 
     def get_position(self):
         return self.arrow.get_position()
