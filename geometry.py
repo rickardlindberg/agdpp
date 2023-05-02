@@ -1,3 +1,4 @@
+from collections import namedtuple
 import math
 
 class OutsideScreenSpace:
@@ -51,11 +52,7 @@ class OutsideScreenSpace:
         else:
             return False
 
-class Point:
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+class Point(namedtuple("Point", "x,y")):
 
     def distance_to(self, point):
         """
@@ -67,31 +64,31 @@ class Point:
     def move(self, dx=0, dy=0):
         """
         >>> Point(0, 0).move(10, 10)
-        Point(10, 10)
+        Point(x=10, y=10)
         """
         return Point(x=self.x+dx, y=self.y+dy)
 
     def add(self, point):
         """
         >>> Point(0, 5).add(Point(1, 1))
-        Point(1, 6)
+        Point(x=1, y=6)
         """
         return self.move(dx=point.x, dy=point.y)
 
     def times(self, magnification):
         """
         >>> Point(1, 5).times(2)
-        Point(2, 10)
+        Point(x=2, y=10)
         """
         return Point(x=self.x*magnification, y=self.y*magnification)
 
     def set(self, x=None, y=None):
         """
         >>> Point(0, 0).set(10, 10)
-        Point(10, 10)
+        Point(x=10, y=10)
 
         >>> Point(5, 5).set()
-        Point(5, 5)
+        Point(x=5, y=5)
         """
         return Point(
             x=self.x if x is None else x,
@@ -101,33 +98,31 @@ class Point:
     def to_angle(self):
         """
         >>> Point(0, -1).to_angle()
-        Angle(-90.0)
+        Angle(degrees=-90.0)
 
         >>> Point(1, 0).to_angle()
-        Angle(0.0)
+        Angle(degrees=0.0)
         """
         return Angle(math.degrees(math.atan2(self.y, self.x)))
 
-    def __repr__(self):
-        return f"Point({self.x}, {self.y})"
-
-class Angle:
+class Angle(namedtuple("Angle", "degrees")):
 
     @staticmethod
     def up():
         return Angle(-90)
 
     @staticmethod
+    def zero():
+        return Angle(0)
+
+    @staticmethod
     def fraction_of_whole(fraction):
         return Angle(360 * fraction)
-
-    def __init__(self, degrees):
-        self.degrees = degrees
 
     def to_unit_point(self):
         """
         >>> Angle.up().to_unit_point()
-        Point(6.123233995736766e-17, -1.0)
+        Point(x=6.123233995736766e-17, y=-1.0)
         """
         return Point(
             x=math.cos(math.radians(self.degrees)),
@@ -136,6 +131,3 @@ class Angle:
 
     def add(self, other):
         return Angle(self.degrees + other.degrees)
-
-    def __repr__(self):
-        return f"Angle({self.degrees})"

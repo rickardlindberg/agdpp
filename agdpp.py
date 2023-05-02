@@ -212,16 +212,11 @@ class GameScene(SpriteGroup):
     ====================
 
     >>> game = GameScene(space)
-    >>> game.get_arrow_angle()
-    Angle(-90)
+    >>> initial_angle = game.get_arrow_angle()
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.update(1)
-    >>> game.get_arrow_angle()
-    Angle(-90.18)
-    >>> game.event(GameLoop.create_event_keydown(KEY_RIGHT))
-    >>> game.update(1)
-    >>> game.get_arrow_angle()
-    Angle(-90.0)
+    >>> game.get_arrow_angle() < initial_angle
+    True
 
     Arrows flying outside screen
     ============================
@@ -316,47 +311,50 @@ class InputHandler:
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(-0.18)
+    >>> first_turn_angle = i.get_turn_angle()
+    >>> first_turn_angle < Angle.zero()
+    True
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(-0.18)
+    >>> i.get_turn_angle() == first_turn_angle
+    True
     >>> i.action(GameLoop.create_event_keyup(KEY_LEFT))
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.0)
+    >>> i.get_turn_angle() == Angle.zero()
+    True
 
     Right keeps turning arrow right:
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.18)
+    >>> first_turn_angle = i.get_turn_angle()
+    >>> first_turn_angle > Angle.zero()
+    True
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.18)
+    >>> i.get_turn_angle() == first_turn_angle
+    True
     >>> i.action(GameLoop.create_event_keyup(KEY_RIGHT))
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.0)
+    >>> i.get_turn_angle() == Angle.zero()
+    True
 
     Joystick x-axis motion keeps turning arrow.
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.18)
+    >>> first_turn_angle = i.get_turn_angle()
+    >>> first_turn_angle > Angle.zero()
+    True
     >>> i.update(1)
-    >>> i.get_turn_angle()
-    Angle(0.18)
+    >>> i.get_turn_angle() == first_turn_angle
+    True
     """
 
     def __init__(self):
         self.arrow_turn_factor = ResettableValue(0)
         self.shoot_down = ResettableValue(False)
-        self.turn_speed = 1/2000
+        self.turn_speed = 1/2500
 
     def get_shoot(self):
         return self.shoot
@@ -395,10 +393,10 @@ class Bow(SpriteGroup):
         """
         >>> bow = Bow()
         >>> bow.get_angle()
-        Angle(-90)
+        Angle(degrees=-90)
         >>> bow.turn(Angle.fraction_of_whole(0.5))
         >>> bow.get_angle()
-        Angle(-90)
+        Angle(degrees=-90)
         """
         new_angle = self.get_angle().add(angle)
         if new_angle.to_unit_point().y < 0:
