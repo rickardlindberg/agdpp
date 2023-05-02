@@ -356,6 +356,7 @@ class InputHandler:
     def __init__(self):
         self.arrow_turn_factor = ResettableValue(0)
         self.shoot_down = ResettableValue(False)
+        self.turn_speed = 1/2000
 
     def get_shoot(self):
         return self.shoot
@@ -365,7 +366,7 @@ class InputHandler:
 
     def update(self, dt):
         self.shoot = self.shoot_down.get_and_reset()
-        self.turn_angle = Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*1/2000)
+        self.turn_angle = Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*self.turn_speed)
 
     def action(self, event):
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
