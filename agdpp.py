@@ -261,7 +261,7 @@ class GameScene(SpriteGroup):
         self.input_handler.update(dt)
         if self.input_handler.get_shoot():
             self.flying_arrows.add(self.bow.clone_shooting())
-        self.bow.set_angle(self.input_handler.get_arrow_angle())
+        self.bow.turn(self.input_handler.get_turn_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
@@ -320,57 +320,56 @@ class InputHandler:
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-90.18)
+    >>> i.get_turn_angle()
+    Angle(-0.18)
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-90.36000000000001)
+    >>> i.get_turn_angle()
+    Angle(-0.18)
     >>> i.action(GameLoop.create_event_keyup(KEY_LEFT))
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-90.36000000000001)
+    >>> i.get_turn_angle()
+    Angle(0.0)
 
     Right keeps turning arrow right:
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-89.82)
+    >>> i.get_turn_angle()
+    Angle(0.18)
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-89.63999999999999)
+    >>> i.get_turn_angle()
+    Angle(0.18)
     >>> i.action(GameLoop.create_event_keyup(KEY_RIGHT))
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-89.63999999999999)
+    >>> i.get_turn_angle()
+    Angle(0.0)
 
     Joystick x-axis motion keeps turning arrow.
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-89.82)
+    >>> i.get_turn_angle()
+    Angle(0.18)
     >>> i.update(1)
-    >>> i.get_arrow_angle()
-    Angle(-89.63999999999999)
+    >>> i.get_turn_angle()
+    Angle(0.18)
     """
 
     def __init__(self):
-        self.arrow_angle = Angle.up()
         self.arrow_turn_factor = ResettableValue(0)
         self.shoot_down = ResettableValue(False)
 
     def get_shoot(self):
         return self.shoot
 
-    def get_arrow_angle(self):
-        return self.arrow_angle
+    def get_turn_angle(self):
+        return self.turn_angle
 
     def update(self, dt):
         self.shoot = self.shoot_down.get_and_reset()
-        self.arrow_angle = self.arrow_angle.add(Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*1/2000))
+        self.turn_angle = Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*1/2000)
 
     def action(self, event):
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
@@ -425,6 +424,9 @@ class Bow(SpriteGroup):
     def __init__(self):
         SpriteGroup.__init__(self)
         self.arrow = self.add(Arrow())
+
+    def turn(self, angle):
+        self.arrow.set_angle(self.arrow.angle.add(angle))
 
     def get_angle(self):
         return self.arrow.angle
