@@ -117,6 +117,10 @@ class Angle:
     def up():
         return Angle(-90)
 
+    @staticmethod
+    def fraction_of_whole(fraction):
+        return Angle(360 * fraction)
+
     def __init__(self, degrees):
         self.degrees = degrees
 
@@ -130,8 +134,8 @@ class Angle:
             y=math.sin(math.radians(self.degrees))
         )
 
-    def add(self, fraction_of_round):
-        return Angle(self.degrees + 360 * fraction_of_round)
+    def add(self, other):
+        return Angle(self.degrees + other.degrees)
 
     def __repr__(self):
         return f"Angle({self.degrees})"

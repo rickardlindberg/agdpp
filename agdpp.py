@@ -370,7 +370,7 @@ class InputHandler:
 
     def update(self, dt):
         self.shoot = self.shoot_down.get_and_reset()
-        self.arrow_angle = self.arrow_angle.add(self.arrow_turn_factor.get()*dt*1/2000)
+        self.arrow_angle = self.arrow_angle.add(Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*1/2000))
 
     def action(self, event):
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
@@ -474,7 +474,7 @@ class Arrow:
             self.position = self.position.add(self.angle.to_unit_point().times(dt))
 
     def draw(self, loop):
-        v = self.angle.add(180/360).to_unit_point()
+        v = self.angle.add(Angle.fraction_of_whole(0.5)).to_unit_point()
         loop.draw_circle(self.position, color="blue", radius=10)
         loop.draw_circle(self.position.add(v.times(20)), color="blue", radius=15)
         loop.draw_circle(self.position.add(v.times(40)), color="blue", radius=20)
