@@ -259,7 +259,7 @@ class GameScene(SpriteGroup):
 
     def update(self, dt):
         self.input_handler.update(dt)
-        for shot in self.input_handler.get_shots():
+        if self.input_handler.get_shoot():
             self.flying_arrows.add(self.arrow.clone_shooting())
         self.arrow.set_angle(self.input_handler.get_arrow_angle())
         SpriteGroup.update(self, dt)
@@ -293,17 +293,27 @@ class GameScene(SpriteGroup):
 class InputHandler:
 
     """
-    Space and Xbox A adds a shot:
+    Space shoots and resets:
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
+    >>> i.update(1)
+    >>> i.get_shoot()
+    True
+    >>> i.update(1)
+    >>> i.get_shoot()
+    False
+
+    Xbox A shoots and resets:
+
+    >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
     >>> i.update(1)
-    >>> i.get_shots()
-    [1, 1]
+    >>> i.get_shoot()
+    True
     >>> i.update(1)
-    >>> i.get_shots()
-    []
+    >>> i.get_shoot()
+    False
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
@@ -336,27 +346,21 @@ class InputHandler:
     def __init__(self):
         self.arrow_angle = Angle.up()
         self.delta = 0
-        self.empty_actions()
+        self.shoot_down = Memory(False)
 
-    def get_shots(self):
-        return self.last_actions["shots"]
+    def get_shoot(self):
+        return self.shoot
 
     def get_arrow_angle(self):
-        return self.last_actions["arrow_angle"]
-
-    def empty_actions(self):
-        self.actions = {"shots": []}
+        return self.arrow_angle
 
     def update(self, dt):
-        self.last_actions = self.actions
+        self.shoot = self.shoot_down.get_and_reset()
         self.arrow_angle = self.arrow_angle.add(dt*self.delta*1/2000)
-        self.last_actions["arrow_angle"] = self.arrow_angle
-        self.empty_actions()
 
     def action(self, event):
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
-            self.actions["shots"].append(1)
-            return None
+            self.shoot_down.set(True)
         elif event.is_keydown_left():
             self.arrow_angle = self.arrow_angle.add(-5/360)
         elif event.is_keydown_right():
@@ -366,6 +370,31 @@ class InputHandler:
                 self.delta = event.get_value()
             else:
                 self.delta = 0
+
+class Memory:
+
+    """
+    >>> i = Memory(5)
+    >>> i.get_and_reset()
+    5
+    >>> i.set(6)
+    >>> i.get_and_reset()
+    6
+    >>> i.get_and_reset()
+    5
+    """
+
+    def __init__(self, default):
+        self.default = default
+        self.value = default
+
+    def get_and_reset(self):
+        x = self.value
+        self.value = self.default
+        return x
+
+    def set(self, value):
+        self.value = value
 
 class Arrow:
 
