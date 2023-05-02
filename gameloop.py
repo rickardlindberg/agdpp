@@ -109,6 +109,14 @@ class GameLoop(Observable):
         return Event(pygame.event.Event(pygame.KEYDOWN, key=key))
 
     @staticmethod
+    def create_event_keyup(key):
+        """
+        >>> GameLoop.create_event_keyup(KEY_LEFT).is_keyup(KEY_LEFT)
+        True
+        """
+        return Event(pygame.event.Event(pygame.KEYUP, key=key))
+
+    @staticmethod
     def create_event_joystick_down(button):
         """
         >>> event = GameLoop.create_event_joystick_down(button=5)
@@ -201,6 +209,9 @@ class Event:
 
     def is_keydown(self, key):
         return self.pygame_event.type == pygame.KEYDOWN and self.pygame_event.key == key
+
+    def is_keyup(self, key):
+        return self.pygame_event.type == pygame.KEYUP and self.pygame_event.key == key
 
     def is_joystick_down(self, button):
         return (

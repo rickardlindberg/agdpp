@@ -214,11 +214,11 @@ class GameScene(SpriteGroup):
     >>> game.get_arrow_angle()
     Angle(-90)
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
-    >>> game.update(0)
+    >>> game.update(1)
     >>> game.get_arrow_angle()
-    Angle(-95.0)
+    Angle(-90.18)
     >>> game.event(GameLoop.create_event_keydown(KEY_RIGHT))
-    >>> game.update(0)
+    >>> game.update(1)
     >>> game.get_arrow_angle()
     Angle(-90.0)
 
@@ -315,23 +315,35 @@ class InputHandler:
     >>> i.get_shoot()
     False
 
+    Left keeps turning arrow left:
+
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
     >>> i.update(1)
     >>> i.get_arrow_angle()
-    Angle(-95.0)
+    Angle(-90.18)
     >>> i.update(1)
     >>> i.get_arrow_angle()
-    Angle(-95.0)
+    Angle(-90.36000000000001)
+    >>> i.action(GameLoop.create_event_keyup(KEY_LEFT))
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
+    Angle(-90.36000000000001)
+
+    Right keeps turning arrow right:
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
     >>> i.update(1)
     >>> i.get_arrow_angle()
-    Angle(-85.0)
+    Angle(-89.82)
     >>> i.update(1)
     >>> i.get_arrow_angle()
-    Angle(-85.0)
+    Angle(-89.63999999999999)
+    >>> i.action(GameLoop.create_event_keyup(KEY_RIGHT))
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
+    Angle(-89.63999999999999)
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
@@ -362,9 +374,13 @@ class InputHandler:
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
             self.shoot_down.set(True)
         elif event.is_keydown(KEY_LEFT):
-            self.arrow_angle = self.arrow_angle.add(-5/360)
+            self.delta = -1
+        elif event.is_keyup(KEY_LEFT):
+            self.delta = 0
         elif event.is_keydown(KEY_RIGHT):
-            self.arrow_angle = self.arrow_angle.add(5/360)
+            self.delta = 1
+        elif event.is_keyup(KEY_RIGHT):
+            self.delta = 0
         elif event.is_joystick_motion() and event.get_axis() == 0:
             if abs(event.get_value()) > 0.01:
                 self.delta = event.get_value()
