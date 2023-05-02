@@ -388,7 +388,7 @@ class Bow(SpriteGroup):
 
     def __init__(self):
         SpriteGroup.__init__(self)
-        self.arrow = self.add(Arrow())
+        self.arrow = self.add(Arrow(angle=Angle.up()))
 
     def turn(self, angle):
         """
