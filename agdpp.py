@@ -258,10 +258,10 @@ class GameScene(SpriteGroup):
             actions[action[0]](*action[1:])
 
     def update(self, dt):
-        actions = self.input_handler.pop(dt)
-        for shot in actions["shots"]:
+        self.input_handler.update(dt)
+        for shot in self.input_handler.get_shots():
             self.flying_arrows.add(self.arrow.clone_shooting())
-        self.arrow.set_angle(actions["arrow_angle"])
+        self.arrow.set_angle(self.input_handler.get_arrow_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
@@ -298,30 +298,38 @@ class InputHandler:
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
     >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
-    >>> i.pop(1)["shots"]
+    >>> i.update(1)
+    >>> i.get_shots()
     [1, 1]
-    >>> i.pop(1)["shots"]
+    >>> i.update(1)
+    >>> i.get_shots()
     []
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-95.0)
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-95.0)
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-85.0)
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-85.0)
 
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-89.82)
-    >>> i.pop(1)["arrow_angle"]
+    >>> i.update(1)
+    >>> i.get_arrow_angle()
     Angle(-89.63999999999999)
     """
 
@@ -330,15 +338,20 @@ class InputHandler:
         self.delta = 0
         self.empty_actions()
 
+    def get_shots(self):
+        return self.last_actions["shots"]
+
+    def get_arrow_angle(self):
+        return self.last_actions["arrow_angle"]
+
     def empty_actions(self):
         self.actions = {"shots": []}
 
-    def pop(self, dt):
-        actions = self.actions
+    def update(self, dt):
+        self.last_actions = self.actions
         self.arrow_angle = self.arrow_angle.add(dt*self.delta*1/2000)
-        actions["arrow_angle"] = self.arrow_angle
+        self.last_actions["arrow_angle"] = self.arrow_angle
         self.empty_actions()
-        return actions
 
     def action(self, event):
         if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
