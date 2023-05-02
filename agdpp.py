@@ -345,6 +345,8 @@ class InputHandler:
     >>> i.get_arrow_angle()
     Angle(-89.63999999999999)
 
+    Joystick x-axis motion keeps turning arrow.
+
     >>> i = InputHandler()
     >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
     >>> i.update(1)
@@ -357,8 +359,8 @@ class InputHandler:
 
     def __init__(self):
         self.arrow_angle = Angle.up()
-        self.delta = 0
-        self.shoot_down = Memory(False)
+        self.arrow_turn_factor = ResettableValue(0)
+        self.shoot_down = ResettableValue(False)
 
     def get_shoot(self):
         return self.shoot
@@ -368,29 +370,29 @@ class InputHandler:
 
     def update(self, dt):
         self.shoot = self.shoot_down.get_and_reset()
-        self.arrow_angle = self.arrow_angle.add(dt*self.delta*1/2000)
+        self.arrow_angle = self.arrow_angle.add(self.arrow_turn_factor.get()*dt*1/2000)
 
     def action(self, event):
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
             self.shoot_down.set(True)
         elif event.is_keydown(KEY_LEFT):
-            self.delta = -1
+            self.arrow_turn_factor.set(-1)
         elif event.is_keyup(KEY_LEFT):
-            self.delta = 0
+            self.arrow_turn_factor.reset()
         elif event.is_keydown(KEY_RIGHT):
-            self.delta = 1
+            self.arrow_turn_factor.set(1)
         elif event.is_keyup(KEY_RIGHT):
-            self.delta = 0
+            self.arrow_turn_factor.reset()
         elif event.is_joystick_motion() and event.get_axis() == 0:
             if abs(event.get_value()) > 0.01:
-                self.delta = event.get_value()
+                self.arrow_turn_factor.set(event.get_value())
             else:
-                self.delta = 0
+                self.arrow_turn_factor.reset()
 
-class Memory:
+class ResettableValue:
 
     """
-    >>> i = Memory(5)
+    >>> i = ResettableValue(5)
     >>> i.get_and_reset()
     5
     >>> i.set(6)
@@ -405,12 +407,18 @@ class Memory:
         self.value = default
 
     def get_and_reset(self):
-        x = self.value
-        self.value = self.default
+        x = self.get()
+        self.reset()
         return x
+
+    def get(self):
+        return self.value
 
     def set(self, value):
         self.value = value
+
+    def reset(self):
+        self.value = self.default
 
 class Arrow:
 
