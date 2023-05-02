@@ -8,6 +8,7 @@ from geometry import Angle
 from geometry import OutsideScreenSpace
 from geometry import Point
 from sprites import SpriteGroup
+from state import ResettableValue
 
 class BalloonShooter:
 
@@ -382,37 +383,6 @@ class InputHandler:
                 self.arrow_turn_factor.set(event.get_value())
             else:
                 self.arrow_turn_factor.reset()
-
-class ResettableValue:
-
-    """
-    >>> i = ResettableValue(5)
-    >>> i.get_and_reset()
-    5
-    >>> i.set(6)
-    >>> i.get_and_reset()
-    6
-    >>> i.get_and_reset()
-    5
-    """
-
-    def __init__(self, default):
-        self.default = default
-        self.value = default
-
-    def get_and_reset(self):
-        x = self.get()
-        self.reset()
-        return x
-
-    def get(self):
-        return self.value
-
-    def set(self, value):
-        self.value = value
-
-    def reset(self):
-        self.value = self.default
 
 class Bow(SpriteGroup):
 
