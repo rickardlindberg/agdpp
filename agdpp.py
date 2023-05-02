@@ -240,7 +240,7 @@ class GameScene(SpriteGroup):
         self.balloons = self.add(SpriteGroup([
             Balloon(Point(x=x, y=y)) for (x, y) in balloons
         ]))
-        self.arrow = self.add(Arrow())
+        self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
         ]))
@@ -251,7 +251,7 @@ class GameScene(SpriteGroup):
         if event.is_user_closed_window():
             raise ExitGameLoop()
         actions = {
-            "set_arrow_angle": lambda angle: self.arrow.set_angle(angle),
+            "set_arrow_angle": lambda angle: self.bow.set_angle(angle),
         }
         action = self.input_handler.action(event)
         if action:
@@ -260,8 +260,8 @@ class GameScene(SpriteGroup):
     def update(self, dt):
         self.input_handler.update(dt)
         if self.input_handler.get_shoot():
-            self.flying_arrows.add(self.arrow.clone_shooting())
-        self.arrow.set_angle(self.input_handler.get_arrow_angle())
+            self.flying_arrows.add(self.bow.clone_shooting())
+        self.bow.set_angle(self.input_handler.get_arrow_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
@@ -276,7 +276,7 @@ class GameScene(SpriteGroup):
         return self.balloons.get_sprites()[0].get_position()
 
     def get_arrow_position(self):
-        return self.arrow.get_position()
+        return self.bow.get_position()
 
     def get_flying_arrows(self):
         return self.flying_arrows.get_sprites()
@@ -288,7 +288,7 @@ class GameScene(SpriteGroup):
         return self.score.score
 
     def get_arrow_angle(self):
-        return self.arrow.angle
+        return self.bow.get_angle()
 
 class InputHandler:
 
@@ -419,6 +419,24 @@ class ResettableValue:
 
     def reset(self):
         self.value = self.default
+
+class Bow(SpriteGroup):
+
+    def __init__(self):
+        SpriteGroup.__init__(self)
+        self.arrow = self.add(Arrow())
+
+    def get_angle(self):
+        return self.arrow.angle
+
+    def set_angle(self, angle):
+        self.arrow.set_angle(angle)
+
+    def get_position(self):
+        return self.arrow.get_position()
+
+    def clone_shooting(self):
+        return self.arrow.clone_shooting()
 
 class Arrow:
 
