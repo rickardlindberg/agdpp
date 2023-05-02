@@ -250,12 +250,7 @@ class GameScene(SpriteGroup):
     def event(self, event):
         if event.is_user_closed_window():
             raise ExitGameLoop()
-        actions = {
-            "set_arrow_angle": lambda angle: self.bow.set_angle(angle),
-        }
-        action = self.input_handler.action(event)
-        if action:
-            actions[action[0]](*action[1:])
+        self.input_handler.action(event)
 
     def update(self, dt):
         self.input_handler.update(dt)
