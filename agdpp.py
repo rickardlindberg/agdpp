@@ -439,7 +439,7 @@ class Bow(SpriteGroup):
             self.arrow.set_angle(new_angle)
 
     def get_angle(self):
-        return self.arrow.angle
+        return self.arrow.get_angle()
 
     def set_angle(self, angle):
         self.arrow.set_angle(angle)
@@ -456,6 +456,9 @@ class Arrow:
         self.position = position
         self.shooting = shooting
         self.angle = angle
+
+    def get_angle(self):
+        return self.angle
 
     def set_angle(self, angle):
         self.angle = angle
