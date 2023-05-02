@@ -359,11 +359,11 @@ class InputHandler:
         self.arrow_angle = self.arrow_angle.add(dt*self.delta*1/2000)
 
     def action(self, event):
-        if event.is_keydown_space() or event.is_joystick_down(XBOX_A):
+        if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
             self.shoot_down.set(True)
-        elif event.is_keydown_left():
+        elif event.is_keydown(KEY_LEFT):
             self.arrow_angle = self.arrow_angle.add(-5/360)
-        elif event.is_keydown_right():
+        elif event.is_keydown(KEY_RIGHT):
             self.arrow_angle = self.arrow_angle.add(5/360)
         elif event.is_joystick_motion() and event.get_axis() == 0:
             if abs(event.get_value()) > 0.01:

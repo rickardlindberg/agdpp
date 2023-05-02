@@ -199,15 +199,6 @@ class Event:
     def is_user_closed_window(self):
         return self.pygame_event.type == pygame.QUIT
 
-    def is_keydown_space(self):
-        return self.is_keydown(pygame.K_SPACE)
-
-    def is_keydown_left(self):
-        return self.is_keydown(pygame.K_LEFT)
-
-    def is_keydown_right(self):
-        return self.is_keydown(pygame.K_RIGHT)
-
     def is_keydown(self, key):
         return self.pygame_event.type == pygame.KEYDOWN and self.pygame_event.key == key
 
