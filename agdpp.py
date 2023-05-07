@@ -162,7 +162,10 @@ class GameScene:
         self.active_scene.update(dt)
         if isinstance(self.active_scene, StartScene):
             if self.active_scene.get_players():
-                self.active_scene = GameplayScene(screen_area=self.screen_area)
+                self.active_scene = GameplayScene(
+                    screen_area=self.screen_area,
+                    players=self.active_scene.get_players()
+                )
 
     def draw(self, loop):
         self.active_scene.draw(loop)
@@ -333,11 +336,13 @@ class GameplayScene(SpriteGroup):
     []
     """
 
-    def __init__(self, screen_area, balloons=[], arrows=[]):
+    def __init__(self, screen_area, balloons=[], arrows=[], players=["default"]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
         self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
-        self.bow = self.add(Bow())
+        self.bows = {}
+        for player in players:
+            self.bows[player] = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
         ]))
@@ -352,8 +357,8 @@ class GameplayScene(SpriteGroup):
     def update(self, dt):
         self.input_handler.update(dt)
         if self.input_handler.get_shoot():
-            self.flying_arrows.add(self.bow.shoot())
-        self.bow.turn(self.input_handler.get_turn_angle())
+            self.flying_arrows.add(self.get_bow().shoot())
+        self.get_bow().turn(self.input_handler.get_turn_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
@@ -364,7 +369,13 @@ class GameplayScene(SpriteGroup):
                 self.score.add(1)
 
     def get_arrow_position(self):
-        return self.bow.get_position()
+        self.get_bow().get_position()
+
+    def get_bow(self, player=None):
+        bow = self.bows.get(player)
+        if bow is None:
+            bow = list(self.bows.values())[0]
+        return bow
 
     def get_flying_arrows(self):
         return self.flying_arrows.get_sprites()
@@ -376,7 +387,7 @@ class GameplayScene(SpriteGroup):
         return self.score.score
 
     def get_arrow_angle(self):
-        return self.bow.get_angle()
+        return self.get_bow().get_angle()
 
 class Balloons(SpriteGroup):
 
