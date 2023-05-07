@@ -484,7 +484,7 @@ class Arrow:
         return not screen_area.inflate(20).contains(self.position)
 
     def hits_baloon(self, balloon):
-        return balloon.inside(self.position)
+        return balloon.contains(self.position)
 
     def update(self, dt):
         if self.shooting:
@@ -509,12 +509,12 @@ class Balloon:
     def is_outside_of(self, screen_area):
         return not screen_area.inflate(self.radius*2).contains(self.position)
 
-    def inside(self, position):
+    def contains(self, position):
         """
         >>> balloon = Balloon(Point(x=50, y=50), radius=20)
-        >>> balloon.inside(Point(50, 50))
+        >>> balloon.contains(Point(50, 50))
         True
-        >>> balloon.inside(Point(100, 100))
+        >>> balloon.contains(Point(100, 100))
         False
         """
         return self.position.distance_to(position) <= self.radius
