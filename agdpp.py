@@ -216,17 +216,39 @@ class StartScene(SpriteGroup):
 
     def draw(self, loop):
         SpriteGroup.draw(self, loop)
+        loop.draw_text(
+            position=Point(x=400, y=50),
+            text="Balloon Shooter",
+            size=70
+        )
         line_height = 50
         loop.draw_text(
-            position=Point(x=100, y=100),
-            text="Press 'shoot' to add player",
+            position=Point(x=100, y=150),
+            text="Shoot to add player",
             size=50
         )
         for index, player in enumerate(self.pending_players):
             loop.draw_text(
-                position=Point(x=150, y=200+line_height*index),
-                text=f"player {index+1}: {player} (press 'shoot' to start game)",
+                position=Point(x=150, y=220+line_height*index),
+                text=f"Player {index+1}: {player} (shoot to start game)",
                 size=40
+            )
+        for index, line in enumerate([
+            "           CONTROLS",
+            "",
+            "Shoot:",
+            "    Space / Xbox A",
+            "",
+            "Turn left:",
+            "    Left / Xbox left joystick left",
+            "",
+            "Turn right:",
+            "    Right / Xbox left joystick right",
+        ]):
+            loop.draw_text(
+                position=Point(x=800, y=400+index*25),
+                text=line,
+                size=30
             )
 
 class GameplayScene(SpriteGroup):
