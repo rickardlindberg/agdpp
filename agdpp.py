@@ -182,14 +182,14 @@ class GameScene(SpriteGroup):
     Arrow colliding with balloon
     ============================
 
-    >>> game = GameScene(screen_area, balloons=[(100, 100)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[Point(x=100, y=100)], arrows=[(500, 500)])
     >>> len(game.get_flying_arrows())
     1
     >>> game.update(0)
     >>> len(game.get_flying_arrows())
     1
 
-    >>> game = GameScene(screen_area, balloons=[(500, 500)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[Point(x=500, y=500)], arrows=[(500, 500)])
     >>> balloons = game.get_balloons()
     >>> len(balloons)
     1
@@ -228,7 +228,8 @@ class GameScene(SpriteGroup):
     []
     """
 
-    def __init__(self, screen_area, balloons=[(50, 50)], arrows=[]):
+    # TODO: remove default
+    def __init__(self, screen_area, balloons=[Point(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
         self.balloons = self.add(Balloons(balloons, screen_area))
@@ -283,7 +284,7 @@ class Balloons(SpriteGroup):
 
     Initially I contain balloons at the given positions:
 
-    >>> balloons = Balloons(positions=[(10, 10)])
+    >>> balloons = Balloons(positions=[Point(x=10, y=10)])
     >>> [balloon.get_position() for balloon in balloons.get_sprites()]
     [Point(x=10, y=10)]
 
@@ -295,7 +296,10 @@ class Balloons(SpriteGroup):
 
     When updated, I remove balloons that are outside the screen area:
 
-    >>> balloons = Balloons(positions=[(1000, 1000)], screen_area=Rectangle.from_size(500, 500))
+    >>> balloons = Balloons(
+    ...     positions=[Point(x=1000, y=1000)],
+    ...     screen_area=Rectangle.from_size(500, 500)
+    ... )
     >>> (balloon,) = balloons.get_sprites()
     >>> balloons.update(0)
     >>> balloon in balloons.get_sprites()
@@ -304,7 +308,7 @@ class Balloons(SpriteGroup):
 
     def __init__(self, positions, screen_area=Rectangle.from_size(500, 500)):
         SpriteGroup.__init__(self, [
-            Balloon(Point(x=x, y=y)) for (x, y) in positions
+            Balloon(position=position) for position in positions
         ])
         self.screen_area = screen_area
 
