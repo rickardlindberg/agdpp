@@ -179,23 +179,24 @@ class StartScene(SpriteGroup):
     >>> start.get_players() is None
     True
 
-    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A, instance_id=7))
     >>> start.update(0)
     >>> start.update(0)
     >>> start.get_players() is None
     True
 
-    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A, instance_id=7))
     >>> start.update(0)
     >>> start.update(0)
     >>> start.get_players()
-    ['one']
+    ['joystick7']
     """
 
     def __init__(self, screen_area):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
-        self.shots = 0
+        self.pending_players = []
+        self.players = None
 
     def event(self, event):
         self.input_handler.action(event)
@@ -203,12 +204,14 @@ class StartScene(SpriteGroup):
     def update(self, dt):
         SpriteGroup.update(self, dt)
         self.input_handler.update(dt)
-        if self.input_handler.get_shoot():
-            self.shots += 1
+        for player in self.input_handler.get_shots():
+            if player in self.pending_players:
+                self.players = self.pending_players
+            else:
+                self.pending_players.append(player)
 
     def get_players(self):
-        if self.shots > 1:
-            return ["one"]
+        return self.players
 
 class GameplayScene(SpriteGroup):
 
@@ -526,7 +529,28 @@ class InputHandler:
     def __init__(self):
         self.arrow_turn_factor = ResettableValue(0)
         self.shoot_down = ResettableValue(False)
+        self.downs = {}
         self.turn_speed = 1/2500
+
+    def get_shots(self):
+        """
+        >>> i = InputHandler()
+
+        >>> i.update(0)
+        >>> i.get_shots()
+        []
+
+        >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
+        >>> i.action(GameLoop.create_event_joystick_down(XBOX_A, instance_id=7))
+        >>> i.update(0)
+        >>> i.get_shots()
+        ['keyboard', 'joystick7']
+
+        >>> i.update(0)
+        >>> i.get_shots()
+        []
+        """
+        return self.shots
 
     def get_shoot(self):
         return self.shoot
@@ -536,11 +560,17 @@ class InputHandler:
 
     def update(self, dt):
         self.shoot = self.shoot_down.get_and_reset()
+        self.shots = list(self.downs.keys())
+        self.downs = {}
         self.turn_angle = Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*self.turn_speed)
 
     def action(self, event):
         if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
             self.shoot_down.set(True)
+            if event.is_keydown(KEY_SPACE):
+                self.downs["keyboard"] = True
+            if event.is_joystick_down(XBOX_A):
+                self.downs[f"joystick{event.get_instance_id()}"] = True
         elif event.is_keydown(KEY_LEFT):
             self.arrow_turn_factor.set(-1)
         elif event.is_keyup(KEY_LEFT):

@@ -117,18 +117,20 @@ class GameLoop(Observable):
         return Event(pygame.event.Event(pygame.KEYUP, key=key))
 
     @staticmethod
-    def create_event_joystick_down(button):
+    def create_event_joystick_down(button, instance_id=5):
         """
-        >>> event = GameLoop.create_event_joystick_down(button=5)
+        >>> event = GameLoop.create_event_joystick_down(button=5, instance_id=5)
         >>> event.is_joystick_down(5)
         True
         >>> event.is_joystick_down(4)
         False
+        >>> event.get_instance_id()
+        5
         """
-        return Event(pygame.event.Event(pygame.JOYBUTTONDOWN, button=button))
+        return Event(pygame.event.Event(pygame.JOYBUTTONDOWN, button=button, instance_id=instance_id))
 
     @staticmethod
-    def create_event_joystick_motion(axis=0, value=0):
+    def create_event_joystick_motion(axis=0, value=0, instance_id=5):
         """
         >>> event = GameLoop.create_event_joystick_motion(axis=0, value=0.5)
         >>> event.is_joystick_motion()
@@ -137,8 +139,10 @@ class GameLoop(Observable):
         0
         >>> event.get_value()
         0.5
+        >>> event.get_instance_id()
+        5
         """
-        return Event(pygame.event.Event(pygame.JOYAXISMOTION, axis=axis, value=value))
+        return Event(pygame.event.Event(pygame.JOYAXISMOTION, axis=axis, value=value, instance_id=instance_id))
 
     def __init__(self, pygame):
         Observable.__init__(self)
@@ -230,6 +234,9 @@ class Event:
 
     def get_value(self):
         return self.pygame_event.value
+
+    def get_instance_id(self):
+        return self.pygame_event.instance_id
 
     def __repr__(self):
         return repr(self.pygame_event)
