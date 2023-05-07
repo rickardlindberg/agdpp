@@ -5,8 +5,8 @@ from gameloop import KEY_RIGHT
 from gameloop import KEY_SPACE
 from gameloop import XBOX_A
 from geometry import Angle
-from geometry import OutsideScreenSpace
 from geometry import Point
+from geometry import Rectangle
 from sprites import SpriteGroup
 from state import ResettableValue
 
@@ -113,7 +113,7 @@ class BalloonShooter:
     def __init__(self, loop):
         self.loop = loop
         self.resolution = (1280, 720)
-        self.game_scene = GameScene(OutsideScreenSpace(*self.resolution))
+        self.game_scene = GameScene(Rectangle.from_size(*self.resolution))
 
     def run(self):
         self.loop.run(self, resolution=self.resolution)
@@ -129,14 +129,14 @@ class BalloonShooter:
 class GameScene(SpriteGroup):
 
     """
-    >>> space = OutsideScreenSpace(1280, 720)
+    >>> screen_area = Rectangle.from_size(1280, 720)
 
     Initial state
     =============
 
     The balloon animates:
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> first_position = game.get_balloon_position()
     >>> game.update(10)
     >>> second_position = game.get_balloon_position()
@@ -145,7 +145,7 @@ class GameScene(SpriteGroup):
 
     The arrow stays still:
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> first_position = game.get_arrow_position()
     >>> game.update(10)
     >>> second_position = game.get_arrow_position()
@@ -154,14 +154,14 @@ class GameScene(SpriteGroup):
 
     It has no flying arrows:
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> game.get_flying_arrows()
     []
 
     Pressing space key
     ==================
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> initial_position = game.get_arrow_position()
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10)
@@ -182,14 +182,14 @@ class GameScene(SpriteGroup):
     Arrow colliding with balloon
     ============================
 
-    >>> game = GameScene(space, balloons=[(100, 100)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[(100, 100)], arrows=[(500, 500)])
     >>> len(game.get_flying_arrows())
     1
     >>> game.update(0)
     >>> len(game.get_flying_arrows())
     1
 
-    >>> game = GameScene(space, balloons=[(500, 500)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[(500, 500)], arrows=[(500, 500)])
     >>> balloons = game.get_balloons()
     >>> len(balloons)
     1
@@ -209,7 +209,7 @@ class GameScene(SpriteGroup):
     Changing arrow angle
     ====================
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> initial_angle = game.get_arrow_angle()
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.update(1)
@@ -221,23 +221,23 @@ class GameScene(SpriteGroup):
 
     They are removed:
 
-    >>> game = GameScene(space)
+    >>> game = GameScene(screen_area)
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10000)
     >>> game.get_flying_arrows()
     []
     """
 
-    def __init__(self, space, balloons=[(50, 50)], arrows=[]):
+    def __init__(self, screen_area, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
-        self.balloons = self.add(Balloons(balloons, space))
+        self.balloons = self.add(Balloons(balloons, screen_area))
         self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
         ]))
         self.score = self.add(Score())
-        self.space = space
+        self.screen_area = screen_area
 
     def event(self, event):
         if event.is_user_closed_window():
@@ -252,7 +252,7 @@ class GameScene(SpriteGroup):
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
-            if hit_balloon or arrow.hits_space(self.space):
+            if hit_balloon or arrow.is_outside_of(self.screen_area):
                 self.flying_arrows.remove(arrow)
             if hit_balloon:
                 self.balloons.remove(hit_balloon)
@@ -280,11 +280,11 @@ class GameScene(SpriteGroup):
 class Balloons(SpriteGroup):
 
     """
-    >>> space = OutsideScreenSpace(500, 500)
+    >>> screen_area = Rectangle.from_size(500, 500)
 
     It spawns up to 3 balloons:
 
-    >>> balloons = Balloons([(50, 50)], space)
+    >>> balloons = Balloons([(50, 50)], screen_area)
     >>> len(balloons.get_sprites())
     1
     >>> balloons.update(5)
@@ -293,23 +293,23 @@ class Balloons(SpriteGroup):
 
     Balloons outside the screen is removed:
 
-    >>> balloons = Balloons([(1000, 1000)], space)
+    >>> balloons = Balloons([(1000, 1000)], screen_area)
     >>> (balloon,) = balloons.get_sprites()
     >>> balloons.update(5)
     >>> balloon in balloons.get_sprites()
     False
     """
 
-    def __init__(self, positions, space):
+    def __init__(self, positions, screen_area):
         SpriteGroup.__init__(self, [
             Balloon(Point(x=x, y=y)) for (x, y) in positions
         ])
-        self.space = space
+        self.screen_area = screen_area
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
         for balloon in self.get_sprites():
-            if balloon.hits_space(self.space):
+            if balloon.is_outside_of(self.screen_area):
                 self.remove(balloon)
         while len(self.get_sprites()) < 3:
             self.spawn_new()
@@ -320,7 +320,7 @@ class Balloons(SpriteGroup):
                 return balloon
 
     def spawn_new(self):
-        self.add(Balloon(position=Point(x=self.space.get_random_x(50), y=50)))
+        self.add(Balloon(position=Point(x=self.screen_area.deflate(50).get_random_x(), y=50)))
 
 class InputHandler:
 
@@ -480,8 +480,8 @@ class Arrow:
         """
         return Arrow(shooting=True, position=self.position, angle=self.angle)
 
-    def hits_space(self, space):
-        return space.hits(self.position, 20)
+    def is_outside_of(self, screen_area):
+        return not screen_area.inflate(20).contains(self.position)
 
     def hits_baloon(self, balloon):
         return balloon.inside(self.position)
@@ -506,8 +506,8 @@ class Balloon:
         self.radius = radius
         self.speed = 0.1
 
-    def hits_space(self, space):
-        return space.hits(self.position, self.radius*2)
+    def is_outside_of(self, screen_area):
+        return not screen_area.inflate(self.radius*2).contains(self.position)
 
     def inside(self, position):
         """

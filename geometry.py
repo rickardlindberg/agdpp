@@ -2,59 +2,83 @@ from collections import namedtuple
 import math
 import random
 
-class OutsideScreenSpace:
+class Rectangle(namedtuple("Rectangle", "topleft,bottomright")):
 
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-    def get_random_x(self, margin):
-        return random.randint(margin, self.width-margin*2)
-
-    def hits(self, position, margin):
+    @staticmethod
+    def from_size(width, height):
         """
-        >>> inside_x = 50
-        >>> inside_y = 50
-        >>> space = OutsideScreenSpace(100, 100)
-
-        To the left:
-
-        >>> space.hits(Point(0, inside_y), 10)
-        False
-        >>> space.hits(Point(-10, inside_y), 10)
-        True
-
-        To the right:
-
-        >>> space.hits(Point(100, inside_y), 10)
-        False
-        >>> space.hits(Point(110, inside_y), 10)
-        True
-
-        To the top:
-
-        >>> space.hits(Point(inside_x, 0), 10)
-        False
-        >>> space.hits(Point(inside_x, -10), 10)
-        True
-
-        To the bottom:
-
-        >>> space.hits(Point(inside_x, 100), 10)
-        False
-        >>> space.hits(Point(inside_x, 110), 10)
-        True
+        >>> Rectangle.from_size(100, 200)
+        Rectangle(topleft=Point(x=0, y=0), bottomright=Point(x=100, y=200))
         """
-        if position.x <= -margin:
-            return True
-        elif position.x >= self.width+margin:
-            return True
-        elif position.y <= -margin:
-            return True
-        elif position.y >= self.height+margin:
-            return True
-        else:
+        return Rectangle(
+            topleft=Point(x=0, y=0),
+            bottomright=Point(x=width, y=height)
+        )
+
+    def get_random_x(self):
+        return random.randint(self.topleft.x, self.bottomright.x)
+
+    def deflate(self, amount):
+        """
+        >>> Rectangle.from_size(10, 10).deflate(1)
+        Rectangle(topleft=Point(x=1, y=1), bottomright=Point(x=9, y=9))
+        """
+        return self.inflate(-amount)
+
+    def inflate(self, amount):
+        """
+        >>> Rectangle.from_size(10, 10).inflate(1)
+        Rectangle(topleft=Point(x=-1, y=-1), bottomright=Point(x=11, y=11))
+        """
+        return Rectangle(
+            topleft=self.topleft.move(-amount, -amount),
+            bottomright=self.bottomright.move(amount, amount),
+        )
+
+    def contains(self, point):
+        """
+        >>> r = Rectangle.from_size(200, 100)
+
+        Inside top left:
+
+        >>> r.contains(Point(x=0, y=0))
+        True
+
+        Inside bottom right:
+
+        >>> r.contains(Point(x=200, y=100))
+        True
+
+        Outside left:
+
+        >>> r.contains(Point(x=-1, y=0))
+        False
+
+        Outside Right:
+
+        >>> r.contains(Point(x=201, y=0))
+        False
+
+        Outside top:
+
+        >>> r.contains(Point(x=0, y=-1))
+        False
+
+        Outside bottom:
+
+        >>> r.contains(Point(x=0, y=101))
+        False
+        """
+        if point.x < self.topleft.x:
             return False
+        elif point.x > self.bottomright.x:
+            return False
+        elif point.y < self.topleft.y:
+            return False
+        elif point.y > self.bottomright.y:
+            return False
+        else:
+            return True
 
 class Point(namedtuple("Point", "x,y")):
 
