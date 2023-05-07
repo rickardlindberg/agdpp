@@ -113,7 +113,7 @@ class BalloonShooter:
     def __init__(self, loop):
         self.loop = loop
         self.resolution = (1280, 720)
-        self.game_scene = GameScene(Rectangle.from_size(*self.resolution))
+        self.game_scene = GameplayScene(Rectangle.from_size(*self.resolution))
 
     def run(self):
         self.loop.run(self, resolution=self.resolution)
@@ -126,7 +126,7 @@ class BalloonShooter:
         self.loop.clear_screen()
         self.game_scene.draw(self.loop)
 
-class GameScene(SpriteGroup):
+class GameplayScene(SpriteGroup):
 
     """
     Initial state
@@ -134,7 +134,7 @@ class GameScene(SpriteGroup):
 
     The arrow stays still:
 
-    >>> game = GameScene(Rectangle.from_size(1280, 720))
+    >>> game = GameplayScene(Rectangle.from_size(1280, 720))
     >>> first_position = game.get_arrow_position()
     >>> game.update(10)
     >>> second_position = game.get_arrow_position()
@@ -143,7 +143,7 @@ class GameScene(SpriteGroup):
 
     It has no flying arrows:
 
-    >>> game = GameScene(Rectangle.from_size(1280, 720))
+    >>> game = GameplayScene(Rectangle.from_size(1280, 720))
     >>> game.get_flying_arrows()
     []
 
@@ -155,7 +155,7 @@ class GameScene(SpriteGroup):
     Pressing space key
     ==================
 
-    >>> game = GameScene(Rectangle.from_size(1280, 720))
+    >>> game = GameplayScene(Rectangle.from_size(1280, 720))
     >>> initial_position = game.get_arrow_position()
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10)
@@ -179,7 +179,7 @@ class GameScene(SpriteGroup):
     Misses balloon
     --------------
 
-    >>> game = GameScene(
+    >>> game = GameplayScene(
     ...     screen_area=Rectangle.from_size(1280, 720),
     ...     balloons=[Point(x=100, y=100)],
     ...     arrows=[Point(x=500, y=500)]
@@ -206,7 +206,7 @@ class GameScene(SpriteGroup):
     Hits balloon
     ------------
 
-    >>> game = GameScene(
+    >>> game = GameplayScene(
     ...     screen_area=Rectangle.from_size(1280, 720),
     ...     balloons=[Point(x=500, y=500)],
     ...     arrows=[Point(x=500, y=500)]
@@ -233,7 +233,7 @@ class GameScene(SpriteGroup):
     Changing arrow angle
     ====================
 
-    >>> game = GameScene(Rectangle.from_size(1280, 720))
+    >>> game = GameplayScene(Rectangle.from_size(1280, 720))
     >>> initial_angle = game.get_arrow_angle()
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.update(1)
@@ -245,7 +245,7 @@ class GameScene(SpriteGroup):
 
     They are removed:
 
-    >>> game = GameScene(Rectangle.from_size(1280, 720))
+    >>> game = GameplayScene(Rectangle.from_size(1280, 720))
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10000)
     >>> game.get_flying_arrows()
