@@ -57,8 +57,8 @@ class BalloonShooter:
 
     The score is drawn:
 
-    >>> set(events.filter("DRAW_TEXT").collect("text"))
-    {('0',)}
+    >>> ('0',) in events.filter("DRAW_TEXT").collect("text")
+    True
 
     User presses space key
     ======================
@@ -211,6 +211,21 @@ class StartScene(SpriteGroup):
 
     def get_players(self):
         return self.players
+
+    def draw(self, loop):
+        SpriteGroup.draw(self, loop)
+        line_height = 50
+        loop.draw_text(
+            position=Point(x=100, y=100),
+            text="Press 'shoot' to add player",
+            size=50
+        )
+        for index, player in enumerate(self.pending_players):
+            loop.draw_text(
+                position=Point(x=150, y=200+line_height*index),
+                text=f"player {index+1}: {player} (press 'shoot' to start game)",
+                size=40
+            )
 
 class GameplayScene(SpriteGroup):
 

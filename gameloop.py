@@ -193,13 +193,13 @@ class GameLoop(Observable):
                 radius
             )
 
-    def draw_text(self, position, text):
+    def draw_text(self, position, text, size=100):
         self.notify("DRAW_TEXT", {
             "x": position.x,
             "y": position.y,
             "text": text,
         })
-        f = self.pygame.font.Font(size=100)
+        f = self.pygame.font.Font(size=size)
         surface = f.render(text, True, "black")
         self.screen.blit(surface, (position.x, position.y))
 
