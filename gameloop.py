@@ -128,7 +128,7 @@ class GameLoop(Observable):
         return Event(pygame.event.Event(pygame.JOYBUTTONDOWN, button=button))
 
     @staticmethod
-    def create_event_joystick_motion(axis, value):
+    def create_event_joystick_motion(axis=0, value=0):
         """
         >>> event = GameLoop.create_event_joystick_motion(axis=0, value=0.5)
         >>> event.is_joystick_motion()

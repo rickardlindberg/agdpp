@@ -22,6 +22,8 @@ class BalloonShooter:
 
     >>> events = BalloonShooter.run_in_test_mode(
     ...     events=[
+    ...         [GameLoop.create_event_keydown(KEY_SPACE)],
+    ...         [GameLoop.create_event_keydown(KEY_SPACE)],
     ...         [],
     ...         [],
     ...         [],
@@ -67,7 +69,8 @@ class BalloonShooter:
 
     >>> events = BalloonShooter.run_in_test_mode(
     ...     events=[
-    ...         [],
+    ...         [GameLoop.create_event_keydown(KEY_SPACE)],
+    ...         [GameLoop.create_event_keydown(KEY_SPACE)],
     ...         [],
     ...         [GameLoop.create_event_keydown(KEY_SPACE)],
     ...         [],
@@ -128,17 +131,41 @@ class BalloonShooter:
 
 class GameScene:
 
+    """
+    Initially, I draw the start scene:
+
+    >>> game = GameScene(screen_area=Rectangle.from_size(500, 500))
+    >>> isinstance(game.active_scene, StartScene)
+    True
+
+    When players have been selected, I draw the gameplay scene:
+
+    >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
+    >>> game.update(0)
+    >>> isinstance(game.active_scene, StartScene)
+    True
+
+    >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
+    >>> game.update(0)
+    >>> isinstance(game.active_scene, StartScene)
+    False
+    """
+
     def __init__(self, screen_area):
-        self.gameplay = GameplayScene(screen_area=screen_area)
+        self.screen_area = screen_area
+        self.active_scene = StartScene(screen_area=self.screen_area)
 
     def event(self, event):
-        self.gameplay.event(event)
+        self.active_scene.event(event)
 
     def update(self, dt):
-        self.gameplay.update(dt)
+        self.active_scene.update(dt)
+        if isinstance(self.active_scene, StartScene):
+            if self.active_scene.get_players():
+                self.active_scene = GameplayScene(screen_area=self.screen_area)
 
     def draw(self, loop):
-        self.gameplay.draw(loop)
+        self.active_scene.draw(loop)
 
 class StartScene(SpriteGroup):
 
@@ -151,10 +178,12 @@ class StartScene(SpriteGroup):
 
     >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
     >>> start.update(0)
+    >>> start.update(0)
     >>> start.get_players() is None
     True
 
     >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> start.update(0)
     >>> start.update(0)
     >>> start.get_players()
     ['one']
@@ -170,7 +199,9 @@ class StartScene(SpriteGroup):
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
-        self.shots += 1
+        self.input_handler.update(dt)
+        if self.input_handler.get_shoot():
+            self.shots += 1
 
     def get_players(self):
         if self.shots > 1:
