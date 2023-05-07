@@ -140,6 +140,42 @@ class GameScene:
     def draw(self, loop):
         self.gameplay.draw(loop)
 
+class StartScene(SpriteGroup):
+
+    """
+    I report players when on player has shot twice:
+
+    >>> start = StartScene(screen_area=Rectangle.from_size(500, 500))
+    >>> start.get_players() is None
+    True
+
+    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> start.update(0)
+    >>> start.get_players() is None
+    True
+
+    >>> start.event(GameLoop.create_event_joystick_down(XBOX_A))
+    >>> start.update(0)
+    >>> start.get_players()
+    ['one']
+    """
+
+    def __init__(self, screen_area):
+        SpriteGroup.__init__(self)
+        self.input_handler = InputHandler()
+        self.shots = 0
+
+    def event(self, event):
+        self.input_handler.action(event)
+
+    def update(self, dt):
+        SpriteGroup.update(self, dt)
+        self.shots += 1
+
+    def get_players(self):
+        if self.shots > 1:
+            return ["one"]
+
 class GameplayScene(SpriteGroup):
 
     """
