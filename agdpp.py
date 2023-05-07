@@ -279,27 +279,30 @@ class GameScene(SpriteGroup):
 class Balloons(SpriteGroup):
 
     """
-    >>> screen_area = Rectangle.from_size(500, 500)
+    I maintain a list of active balloons.
 
-    It spawns up to 3 balloons:
+    Initially I contain balloons at the given positions:
 
-    >>> balloons = Balloons([(50, 50)], screen_area)
-    >>> len(balloons.get_sprites())
-    1
-    >>> balloons.update(5)
+    >>> balloons = Balloons(positions=[(10, 10)])
+    >>> [balloon.get_position() for balloon in balloons.get_sprites()]
+    [Point(x=10, y=10)]
+
+    When updated, I spawn new balloons up the count of 3:
+
+    >>> balloons.update(0)
     >>> len(balloons.get_sprites())
     3
 
-    Balloons outside the screen is removed:
+    When updated, I remove balloons that are outside the screen area:
 
-    >>> balloons = Balloons([(1000, 1000)], screen_area)
+    >>> balloons = Balloons(positions=[(1000, 1000)], screen_area=Rectangle.from_size(500, 500))
     >>> (balloon,) = balloons.get_sprites()
-    >>> balloons.update(5)
+    >>> balloons.update(0)
     >>> balloon in balloons.get_sprites()
     False
     """
 
-    def __init__(self, positions, screen_area):
+    def __init__(self, positions, screen_area=Rectangle.from_size(500, 500)):
         SpriteGroup.__init__(self, [
             Balloon(Point(x=x, y=y)) for (x, y) in positions
         ])
