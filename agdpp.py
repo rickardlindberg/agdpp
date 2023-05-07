@@ -256,7 +256,6 @@ class GameScene(SpriteGroup):
                 self.flying_arrows.remove(arrow)
             if hit_balloon:
                 self.balloons.remove(hit_balloon)
-                self.balloons.spawn_new()
                 self.score.add(1)
 
     def get_balloon_position(self):
