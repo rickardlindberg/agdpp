@@ -155,6 +155,8 @@ class GameScene:
         self.active_scene = StartScene(screen_area=self.screen_area)
 
     def event(self, event):
+        if event.is_user_closed_window():
+            raise ExitGameLoop()
         self.active_scene.event(event)
 
     def update(self, dt):
@@ -382,8 +384,6 @@ class GameplayScene(SpriteGroup):
         self.input_handler = InputHandler()
 
     def event(self, event):
-        if event.is_user_closed_window():
-            raise ExitGameLoop()
         self.input_handler.event(event)
 
     def update(self, dt):
