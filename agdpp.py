@@ -198,7 +198,7 @@ class StartScene(SpriteGroup):
         self.players = None
 
     def event(self, event):
-        self.input_handler.action(event)
+        self.input_handler.event(event)
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
@@ -354,7 +354,7 @@ class GameplayScene(SpriteGroup):
     def event(self, event):
         if event.is_user_closed_window():
             raise ExitGameLoop()
-        self.input_handler.action(event)
+        self.input_handler.event(event)
 
     def update(self, dt):
         self.input_handler.update(dt)
@@ -463,6 +463,32 @@ class InputHandler:
         self.turn_factors = {}
         self.turn_speed = 1/2500
 
+    def event(self, event):
+        if event.is_keydown(KEY_SPACE):
+            self.downs["keyboard"] = True
+        elif event.is_joystick_down(XBOX_A):
+            self.downs[f"joystick{event.get_instance_id()}"] = True
+        elif event.is_keydown(KEY_LEFT):
+            self.turn_factors["keyboard"] = -1
+        elif event.is_keyup(KEY_LEFT):
+            self.turn_factors["keyboard"] = 0
+        elif event.is_keydown(KEY_RIGHT):
+            self.turn_factors["keyboard"] = 1
+        elif event.is_keyup(KEY_RIGHT):
+            self.turn_factors["keyboard"] = 0
+        elif event.is_joystick_motion() and event.get_axis() == 0:
+            if abs(event.get_value()) > 0.01:
+                self.turn_factors[f"joystick{event.get_instance_id()}"] = event.get_value()
+            else:
+                self.turn_factors[f"joystick{event.get_instance_id()}"] = 0
+
+    def update(self, dt):
+        self.shots = list(self.downs.keys())
+        self.downs = {}
+        self.turn_angles = {}
+        for key, value in self.turn_factors.items():
+            self.turn_angles[key] = Angle.fraction_of_whole(value*dt*self.turn_speed)
+
     def get_shots(self):
         """
         >>> i = InputHandler()
@@ -471,8 +497,8 @@ class InputHandler:
         >>> i.get_shots()
         []
 
-        >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
-        >>> i.action(GameLoop.create_event_joystick_down(XBOX_A, instance_id=7))
+        >>> i.event(GameLoop.create_event_keydown(KEY_SPACE))
+        >>> i.event(GameLoop.create_event_joystick_down(XBOX_A, instance_id=7))
         >>> i.update(0)
         >>> i.get_shots()
         ['keyboard', 'joystick7']
@@ -491,39 +517,13 @@ class InputHandler:
         >>> i.get_turn_angles()
         {}
 
-        >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
-        >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1, instance_id=7))
+        >>> i.event(GameLoop.create_event_keydown(KEY_LEFT))
+        >>> i.event(GameLoop.create_event_joystick_motion(axis=0, value=1, instance_id=7))
         >>> i.update(1)
         >>> i.get_turn_angles()
         {'keyboard': Angle(degrees=-0.14400000000000002), 'joystick7': Angle(degrees=0.14400000000000002)}
         """
         return self.turn_angles
-
-    def update(self, dt):
-        self.shots = list(self.downs.keys())
-        self.downs = {}
-        self.turn_angles = {}
-        for key, value in self.turn_factors.items():
-            self.turn_angles[key] = Angle.fraction_of_whole(value*dt*self.turn_speed)
-
-    def action(self, event):
-        if event.is_keydown(KEY_SPACE):
-            self.downs["keyboard"] = True
-        elif event.is_joystick_down(XBOX_A):
-            self.downs[f"joystick{event.get_instance_id()}"] = True
-        elif event.is_keydown(KEY_LEFT):
-            self.turn_factors["keyboard"] = -1
-        elif event.is_keyup(KEY_LEFT):
-            self.turn_factors["keyboard"] = 0
-        elif event.is_keydown(KEY_RIGHT):
-            self.turn_factors["keyboard"] = 1
-        elif event.is_keyup(KEY_RIGHT):
-            self.turn_factors["keyboard"] = 0
-        elif event.is_joystick_motion() and event.get_axis() == 0:
-            if abs(event.get_value()) > 0.01:
-                self.turn_factors[f"joystick{event.get_instance_id()}"] = event.get_value()
-            else:
-                self.turn_factors[f"joystick{event.get_instance_id()}"] = 0
 
 class Bow(SpriteGroup):
 
