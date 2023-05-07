@@ -255,11 +255,11 @@ class GameScene(SpriteGroup):
         for arrow in self.flying_arrows.get_sprites():
             if arrow.hits_space(self.space):
                 self.flying_arrows.remove(arrow)
-            for balloon in self.balloons.get_sprites():
-                if arrow.hits_baloon(balloon):
-                    self.balloons.remove(balloon)
-                    self.balloons.add(Balloon(position=Point(x=50, y=50)))
-                    self.score.add(1)
+            hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
+            if hit_balloon:
+                self.balloons.remove(hit_balloon)
+                self.balloons.add(Balloon(position=Point(x=50, y=50)))
+                self.score.add(1)
 
     def get_balloon_position(self):
         return self.balloons.get_sprites()[0].get_position()
@@ -285,6 +285,11 @@ class Balloons(SpriteGroup):
         SpriteGroup.__init__(self, [
             Balloon(Point(x=x, y=y)) for (x, y) in positions
         ])
+
+    def get_balloon_hit_by_arrow(self, arrow):
+        for balloon in self.get_sprites():
+            if arrow.hits_baloon(balloon):
+                return balloon
 
 class InputHandler:
 
