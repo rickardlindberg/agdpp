@@ -27,6 +27,22 @@ class Rectangle(namedtuple("Rectangle", "topleft,bottomright")):
         assert self.topleft.x < self.bottomright.x
         assert self.topleft.y < self.bottomright.y
 
+    @property
+    def bottomleft(self):
+        """
+        >>> Rectangle.from_size(100, 100).bottomleft
+        Point(x=0, y=100)
+        """
+        return self.bottomright.move(dx=-self.width)
+
+    @property
+    def width(self):
+        """
+        >>> Rectangle.from_size(100, 1).width
+        100
+        """
+        return self.bottomright.x - self.topleft.x
+
     def get_random_x(self):
         return random.randint(self.topleft.x, self.bottomright.x)
 

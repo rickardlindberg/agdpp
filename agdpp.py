@@ -49,11 +49,11 @@ class BalloonShooter:
     The arrow is drawn in a fixed position:
 
     >>> set(events.filter("DRAW_CIRCLE", radius=10).collect("x", "y"))
-    {(600, 600)}
+    {(640, 600)}
     >>> set(events.filter("DRAW_CIRCLE", radius=15).collect("x", "y"))
-    {(600, 620)}
+    {(640, 620)}
     >>> set(events.filter("DRAW_CIRCLE", radius=20).collect("x", "y"))
-    {(600, 640)}
+    {(640, 640)}
 
     The score is drawn:
 
@@ -336,20 +336,35 @@ class GameplayScene(SpriteGroup):
     >>> game.update(10000)
     >>> game.get_flying_arrows()
     []
+
+    Bow layout
+    ==========
+
+    It lays out player bows evenly:
+
+
+    >>> game = GameplayScene(Rectangle.from_size(90, 50), players=["one", "two"])
+    >>> game.bow_for_player("one").get_position()
+    Point(x=30.0, y=-70)
+    >>> game.bow_for_player("two").get_position()
+    Point(x=60.0, y=-70)
     """
 
     def __init__(self, screen_area, balloons=[], arrows=[], players=["test_input_device"]):
         SpriteGroup.__init__(self)
-        self.input_handler = InputHandler()
+        self.screen_area = screen_area
         self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
         self.bows = {}
+        bow_position = self.screen_area.bottomleft.move(dy=-120)
+        bow_increment = self.screen_area.width / (len(players)+1)
         for player in players:
-            self.bows[player] = self.add(Bow())
+            bow_position = bow_position.move(dx=bow_increment)
+            self.bows[player] = self.add(Bow(position=bow_position))
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
         ]))
         self.score = self.add(Score())
-        self.screen_area = screen_area
+        self.input_handler = InputHandler()
 
     def event(self, event):
         if event.is_user_closed_window():
@@ -539,9 +554,9 @@ class InputHandler:
 
 class Bow(SpriteGroup):
 
-    def __init__(self):
+    def __init__(self, position=Point(x=600, y=600)):
         SpriteGroup.__init__(self)
-        self.arrow = self.add(Arrow(angle=Angle.up()))
+        self.arrow = self.add(Arrow(angle=Angle.up(), position=position))
 
     def turn(self, angle):
         """
