@@ -24,7 +24,6 @@ if __name__ == "__main__":
             "gameloop",
             "sprites",
             "geometry",
-            "state",
         ]:
             suite.addTest(doctest.DocTestSuite(
                 importlib.import_module(module),

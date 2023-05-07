@@ -8,7 +8,6 @@ from geometry import Angle
 from geometry import Point
 from geometry import Rectangle
 from sprites import SpriteGroup
-from state import ResettableValue
 
 class BalloonShooter:
 
@@ -359,9 +358,10 @@ class GameplayScene(SpriteGroup):
 
     def update(self, dt):
         self.input_handler.update(dt)
-        if self.input_handler.get_shoot():
-            self.flying_arrows.add(self.get_bow().shoot())
-        self.get_bow().turn(self.input_handler.get_turn_angle())
+        for player in self.input_handler.get_shots():
+            self.flying_arrows.add(self.get_bow(player).shoot())
+        for player, turn_angle in self.input_handler.get_turn_angles().items():
+            self.get_bow(player).turn(turn_angle)
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
@@ -458,78 +458,9 @@ class Balloons(SpriteGroup):
 
 class InputHandler:
 
-    """
-    Space shoots and resets:
-
-    >>> i = InputHandler()
-    >>> i.action(GameLoop.create_event_keydown(KEY_SPACE))
-    >>> i.update(1)
-    >>> i.get_shoot()
-    True
-    >>> i.update(1)
-    >>> i.get_shoot()
-    False
-
-    Xbox A shoots and resets:
-
-    >>> i = InputHandler()
-    >>> i.action(GameLoop.create_event_joystick_down(XBOX_A))
-    >>> i.update(1)
-    >>> i.get_shoot()
-    True
-    >>> i.update(1)
-    >>> i.get_shoot()
-    False
-
-    Left keeps turning arrow left:
-
-    >>> i = InputHandler()
-    >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
-    >>> i.update(1)
-    >>> first_turn_angle = i.get_turn_angle()
-    >>> first_turn_angle < Angle.zero()
-    True
-    >>> i.update(1)
-    >>> i.get_turn_angle() == first_turn_angle
-    True
-    >>> i.action(GameLoop.create_event_keyup(KEY_LEFT))
-    >>> i.update(1)
-    >>> i.get_turn_angle() == Angle.zero()
-    True
-
-    Right keeps turning arrow right:
-
-    >>> i = InputHandler()
-    >>> i.action(GameLoop.create_event_keydown(KEY_RIGHT))
-    >>> i.update(1)
-    >>> first_turn_angle = i.get_turn_angle()
-    >>> first_turn_angle > Angle.zero()
-    True
-    >>> i.update(1)
-    >>> i.get_turn_angle() == first_turn_angle
-    True
-    >>> i.action(GameLoop.create_event_keyup(KEY_RIGHT))
-    >>> i.update(1)
-    >>> i.get_turn_angle() == Angle.zero()
-    True
-
-    Joystick x-axis motion keeps turning arrow.
-
-    >>> i = InputHandler()
-    >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1))
-    >>> i.update(1)
-    >>> first_turn_angle = i.get_turn_angle()
-    >>> first_turn_angle > Angle.zero()
-    True
-    >>> i.update(1)
-    >>> i.get_turn_angle() == first_turn_angle
-    True
-    """
-
     def __init__(self):
-        self.arrow_turn_factor = ResettableValue(0)
-        self.shoot_down = ResettableValue(False)
         self.downs = {}
+        self.turn_factors = {}
         self.turn_speed = 1/2500
 
     def get_shots(self):
@@ -552,38 +483,47 @@ class InputHandler:
         """
         return self.shots
 
-    def get_shoot(self):
-        return self.shoot
+    def get_turn_angles(self):
+        """
+        >>> i = InputHandler()
 
-    def get_turn_angle(self):
-        return self.turn_angle
+        >>> i.update(0)
+        >>> i.get_turn_angles()
+        {}
+
+        >>> i.action(GameLoop.create_event_keydown(KEY_LEFT))
+        >>> i.action(GameLoop.create_event_joystick_motion(axis=0, value=1, instance_id=7))
+        >>> i.update(1)
+        >>> i.get_turn_angles()
+        {'keyboard': Angle(degrees=-0.14400000000000002), 'joystick7': Angle(degrees=0.14400000000000002)}
+        """
+        return self.turn_angles
 
     def update(self, dt):
-        self.shoot = self.shoot_down.get_and_reset()
         self.shots = list(self.downs.keys())
         self.downs = {}
-        self.turn_angle = Angle.fraction_of_whole(self.arrow_turn_factor.get()*dt*self.turn_speed)
+        self.turn_angles = {}
+        for key, value in self.turn_factors.items():
+            self.turn_angles[key] = Angle.fraction_of_whole(value*dt*self.turn_speed)
 
     def action(self, event):
-        if event.is_keydown(KEY_SPACE) or event.is_joystick_down(XBOX_A):
-            self.shoot_down.set(True)
-            if event.is_keydown(KEY_SPACE):
-                self.downs["keyboard"] = True
-            if event.is_joystick_down(XBOX_A):
-                self.downs[f"joystick{event.get_instance_id()}"] = True
+        if event.is_keydown(KEY_SPACE):
+            self.downs["keyboard"] = True
+        elif event.is_joystick_down(XBOX_A):
+            self.downs[f"joystick{event.get_instance_id()}"] = True
         elif event.is_keydown(KEY_LEFT):
-            self.arrow_turn_factor.set(-1)
+            self.turn_factors["keyboard"] = -1
         elif event.is_keyup(KEY_LEFT):
-            self.arrow_turn_factor.reset()
+            self.turn_factors["keyboard"] = 0
         elif event.is_keydown(KEY_RIGHT):
-            self.arrow_turn_factor.set(1)
+            self.turn_factors["keyboard"] = 1
         elif event.is_keyup(KEY_RIGHT):
-            self.arrow_turn_factor.reset()
+            self.turn_factors["keyboard"] = 0
         elif event.is_joystick_motion() and event.get_axis() == 0:
             if abs(event.get_value()) > 0.01:
-                self.arrow_turn_factor.set(event.get_value())
+                self.turn_factors[f"joystick{event.get_instance_id()}"] = event.get_value()
             else:
-                self.arrow_turn_factor.reset()
+                self.turn_factors[f"joystick{event.get_instance_id()}"] = 0
 
 class Bow(SpriteGroup):
 
