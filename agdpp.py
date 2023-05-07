@@ -282,18 +282,6 @@ class Balloons(SpriteGroup):
     """
     >>> space = OutsideScreenSpace(500, 500)
 
-    Balloons move downwards (move to Balloon?):
-
-    >>> balloons = Balloons([(50, 50)], space)
-    >>> balloons.get_sprites()[0].get_position()
-    Point(x=50, y=50)
-    >>> balloons.update(5)
-    >>> x, y = balloons.get_sprites()[0].get_position()
-    >>> x
-    50
-    >>> y > 50
-    True
-
     It spawns up to 3 balloons:
 
     >>> balloons = Balloons([(50, 50)], space)
@@ -532,6 +520,19 @@ class Balloon:
         return self.position.distance_to(position) <= self.radius
 
     def update(self, dt):
+        """
+        I move downwards:
+
+        >>> balloon = Balloon(position=Point(x=50, y=50))
+        >>> balloon.get_position()
+        Point(x=50, y=50)
+        >>> balloon.update(5)
+        >>> new_position = balloon.get_position()
+        >>> new_position.x
+        50
+        >>> new_position.y > 50
+        True
+        """
         self.position = self.position.move(dy=dt*self.speed)
 
     def draw(self, loop):
