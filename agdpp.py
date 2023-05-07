@@ -374,9 +374,14 @@ class GameplayScene(SpriteGroup):
         self.bows = {}
         bow_position = self.screen_area.bottomleft.move(dy=-120)
         bow_increment = self.screen_area.width / (len(players)+1)
+        colors = ["blue", "green", "yellow"]
         for player in players:
             bow_position = bow_position.move(dx=bow_increment)
-            self.bows[player] = self.add(Bow(position=bow_position))
+            if colors:
+                color = colors.pop(0)
+            else:
+                color = "black"
+            self.bows[player] = self.add(Bow(position=bow_position, color=color))
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
         ]))
@@ -569,9 +574,9 @@ class InputHandler:
 
 class Bow(SpriteGroup):
 
-    def __init__(self, position=Point(x=600, y=600)):
+    def __init__(self, position=Point(x=600, y=600), color="blue"):
         SpriteGroup.__init__(self)
-        self.arrow = self.add(Arrow(angle=Angle.up(), position=position))
+        self.arrow = self.add(Arrow(angle=Angle.up(), position=position, color=color))
 
     def turn(self, angle):
         """
@@ -597,10 +602,11 @@ class Bow(SpriteGroup):
 
 class Arrow:
 
-    def __init__(self, shooting=False, position=Point(x=600, y=600), angle=Angle.up()):
+    def __init__(self, shooting=False, position=Point(x=600, y=600), angle=Angle.up(), color="blue"):
         self.position = position
         self.shooting = shooting
         self.angle = angle
+        self.color = color
 
     def get_angle(self):
         return self.angle
@@ -612,7 +618,7 @@ class Arrow:
         """
         It preserves position and angle and set it to shooting:
 
-        >>> arrow = Arrow(position=Point(x=5, y=5), angle=-45)
+        >>> arrow = Arrow(position=Point(x=5, y=5), angle=-45, color='pink')
         >>> new_arrow = arrow.clone_shooting()
         >>> new_arrow.get_position()
         Point(x=5, y=5)
@@ -620,8 +626,10 @@ class Arrow:
         -45
         >>> new_arrow.shooting
         True
+        >>> new_arrow.color
+        'pink'
         """
-        return Arrow(shooting=True, position=self.position, angle=self.angle)
+        return Arrow(shooting=True, position=self.position, angle=self.angle, color=self.color)
 
     def is_outside_of(self, screen_area):
         return not screen_area.inflate(20).contains(self.position)
@@ -635,9 +643,9 @@ class Arrow:
 
     def draw(self, loop):
         v = self.angle.add(Angle.fraction_of_whole(0.5)).to_unit_point()
-        loop.draw_circle(self.position, color="blue", radius=10)
-        loop.draw_circle(self.position.add(v.times(20)), color="blue", radius=15)
-        loop.draw_circle(self.position.add(v.times(40)), color="blue", radius=20)
+        loop.draw_circle(self.position, color=self.color, radius=10)
+        loop.draw_circle(self.position.add(v.times(20)), color=self.color, radius=15)
+        loop.draw_circle(self.position.add(v.times(40)), color=self.color, radius=20)
 
     def get_position(self):
         return self.position
