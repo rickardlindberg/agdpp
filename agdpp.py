@@ -338,7 +338,7 @@ class GameplayScene(SpriteGroup):
     []
     """
 
-    def __init__(self, screen_area, balloons=[], arrows=[], players=["default"]):
+    def __init__(self, screen_area, balloons=[], arrows=[], players=["test_input_device"]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
         self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
@@ -359,9 +359,9 @@ class GameplayScene(SpriteGroup):
     def update(self, dt):
         self.input_handler.update(dt)
         for player in self.input_handler.get_shots():
-            self.flying_arrows.add(self.get_bow(player).shoot())
+            self.flying_arrows.add(self.bow_for_player(player).shoot())
         for player, turn_angle in self.input_handler.get_turn_angles().items():
-            self.get_bow(player).turn(turn_angle)
+            self.bow_for_player(player).turn(turn_angle)
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
@@ -371,14 +371,8 @@ class GameplayScene(SpriteGroup):
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
 
-    def get_arrow_position(self):
-        self.get_bow().get_position()
-
-    def get_bow(self, player=None):
-        bow = self.bows.get(player)
-        if bow is None:
-            bow = list(self.bows.values())[0]
-        return bow
+    def get_arrow_position(self, player=None):
+        return self.bow_for_player(player).get_position()
 
     def get_flying_arrows(self):
         return self.flying_arrows.get_sprites()
@@ -389,8 +383,14 @@ class GameplayScene(SpriteGroup):
     def get_score(self):
         return self.score.score
 
-    def get_arrow_angle(self):
-        return self.get_bow().get_angle()
+    def get_arrow_angle(self, player=None):
+        return self.bow_for_player(player).get_angle()
+
+    def bow_for_player(self, player):
+        for input_id, bow in self.bows.items():
+            if input_id == player:
+                return bow
+        return bow
 
 class Balloons(SpriteGroup):
 
