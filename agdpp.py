@@ -134,15 +134,6 @@ class GameScene(SpriteGroup):
     Initial state
     =============
 
-    The balloon animates:
-
-    >>> game = GameScene(screen_area)
-    >>> first_position = game.get_balloon_position()
-    >>> game.update(10)
-    >>> second_position = game.get_balloon_position()
-    >>> first_position == second_position
-    False
-
     The arrow stays still:
 
     >>> game = GameScene(screen_area)
@@ -228,11 +219,10 @@ class GameScene(SpriteGroup):
     []
     """
 
-    # TODO: remove default
-    def __init__(self, screen_area, balloons=[Point(50, 50)], arrows=[]):
+    def __init__(self, screen_area, balloons=[], arrows=[]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
-        self.balloons = self.add(Balloons(balloons, screen_area))
+        self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
         self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
@@ -259,9 +249,6 @@ class GameScene(SpriteGroup):
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
 
-    def get_balloon_position(self):
-        return self.balloons.get_sprites()[0].get_position()
-
     def get_arrow_position(self):
         return self.bow.get_position()
 
@@ -284,15 +271,27 @@ class Balloons(SpriteGroup):
 
     Initially I contain balloons at the given positions:
 
+    >>> Balloons().get_sprites()
+    []
+
     >>> balloons = Balloons(positions=[Point(x=10, y=10)])
-    >>> [balloon.get_position() for balloon in balloons.get_sprites()]
+    >>> [x.get_position() for x in balloons.get_sprites()]
     [Point(x=10, y=10)]
 
     When updated, I spawn new balloons up the count of 3:
 
+    >>> balloons = Balloons()
     >>> balloons.update(0)
-    >>> len(balloons.get_sprites())
+    >>> spawned_balloons = balloons.get_sprites()
+    >>> len(spawned_balloons)
     3
+
+    When updated, I move the balloons:
+
+    >>> spawned_positions = [x.get_position() for x in spawned_balloons]
+    >>> balloons.update(1)
+    >>> spawned_positions == [x.get_position() for x in balloons.get_sprites()]
+    False
 
     When updated, I remove balloons that are outside the screen area:
 
@@ -306,7 +305,7 @@ class Balloons(SpriteGroup):
     False
     """
 
-    def __init__(self, positions, screen_area=Rectangle.from_size(500, 500)):
+    def __init__(self, positions=[], screen_area=Rectangle.from_size(500, 500)):
         SpriteGroup.__init__(self, [
             Balloon(position=position) for position in positions
         ])
