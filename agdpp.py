@@ -233,9 +233,7 @@ class GameScene(SpriteGroup):
     def __init__(self, space, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
-        self.balloons = self.add(SpriteGroup([
-            Balloon(Point(x=x, y=y)) for (x, y) in balloons
-        ]))
+        self.balloons = self.add(Balloons(balloons))
         self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
@@ -280,6 +278,13 @@ class GameScene(SpriteGroup):
 
     def get_arrow_angle(self):
         return self.bow.get_angle()
+
+class Balloons(SpriteGroup):
+
+    def __init__(self, positions):
+        SpriteGroup.__init__(self, [
+            Balloon(Point(x=x, y=y)) for (x, y) in positions
+        ])
 
 class InputHandler:
 
