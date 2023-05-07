@@ -113,7 +113,7 @@ class BalloonShooter:
     def __init__(self, loop):
         self.loop = loop
         self.resolution = (1280, 720)
-        self.game_scene = GameplayScene(Rectangle.from_size(*self.resolution))
+        self.game_scene = GameScene(screen_area=Rectangle.from_size(*self.resolution))
 
     def run(self):
         self.loop.run(self, resolution=self.resolution)
@@ -125,6 +125,20 @@ class BalloonShooter:
         self.game_scene.update(dt)
         self.loop.clear_screen()
         self.game_scene.draw(self.loop)
+
+class GameScene:
+
+    def __init__(self, screen_area):
+        self.gameplay = GameplayScene(screen_area=screen_area)
+
+    def event(self, event):
+        self.gameplay.event(event)
+
+    def update(self, dt):
+        self.gameplay.update(dt)
+
+    def draw(self, loop):
+        self.gameplay.draw(loop)
 
 class GameplayScene(SpriteGroup):
 
