@@ -321,7 +321,7 @@ class Balloons(SpriteGroup):
     def update(self, dt):
         SpriteGroup.update(self, dt)
         for balloon in self.get_sprites():
-            if self.space.hits(balloon.get_position(), 10):
+            if balloon.hits_space(self.space):
                 self.remove(balloon)
         while len(self.get_sprites()) < 3:
             self.spawn_new()
@@ -517,6 +517,9 @@ class Balloon:
         self.position = position
         self.radius = radius
         self.speed = 0.1
+
+    def hits_space(self, space):
+        return space.hits(self.position, self.radius*2)
 
     def inside(self, position):
         """
