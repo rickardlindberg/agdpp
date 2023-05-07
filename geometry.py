@@ -15,6 +15,18 @@ class Rectangle(namedtuple("Rectangle", "topleft,bottomright")):
             bottomright=Point(x=width, y=height)
         )
 
+    def __init__(self, *args, **kwargs):
+        """
+        Create invalid:
+
+        >>> Rectangle(topleft=Point(x=100, y=100), bottomright=Point(x=0, y=0))
+        Traceback (most recent call last):
+          ...
+        AssertionError
+        """
+        assert self.topleft.x < self.bottomright.x
+        assert self.topleft.y < self.bottomright.y
+
     def get_random_x(self):
         return random.randint(self.topleft.x, self.bottomright.x)
 
