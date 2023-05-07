@@ -459,15 +459,15 @@ class Balloons(SpriteGroup):
 class InputHandler:
 
     def __init__(self):
-        self.downs = {}
+        self.shots_triggered = []
         self.turn_factors = {}
         self.turn_speed = 1/2500
 
     def event(self, event):
         if event.is_keydown(KEY_SPACE):
-            self.downs["keyboard"] = True
+            self.shots_triggered.append("keyboard")
         elif event.is_joystick_down(XBOX_A):
-            self.downs[f"joystick{event.get_instance_id()}"] = True
+            self.shots_triggered.append(self.joystick_id(event))
         elif event.is_keydown(KEY_LEFT):
             self.turn_factors["keyboard"] = -1
         elif event.is_keyup(KEY_LEFT):
@@ -478,16 +478,19 @@ class InputHandler:
             self.turn_factors["keyboard"] = 0
         elif event.is_joystick_motion() and event.get_axis() == 0:
             if abs(event.get_value()) > 0.01:
-                self.turn_factors[f"joystick{event.get_instance_id()}"] = event.get_value()
+                self.turn_factors[self.joystick_id(event)] = event.get_value()
             else:
-                self.turn_factors[f"joystick{event.get_instance_id()}"] = 0
+                self.turn_factors[self.joystick_id(event)] = 0
+
+    def joystick_id(self, event):
+        return f"joystick{event.get_instance_id()}"
 
     def update(self, dt):
-        self.shots = list(self.downs.keys())
-        self.downs = {}
+        self.shots = self.shots_triggered
+        self.shots_triggered = []
         self.turn_angles = {}
-        for key, value in self.turn_factors.items():
-            self.turn_angles[key] = Angle.fraction_of_whole(value*dt*self.turn_speed)
+        for input_id, turn_factor in self.turn_factors.items():
+            self.turn_angles[input_id] = Angle.fraction_of_whole(turn_factor*dt*self.turn_speed)
 
     def get_shots(self):
         """
@@ -520,8 +523,17 @@ class InputHandler:
         >>> i.event(GameLoop.create_event_keydown(KEY_LEFT))
         >>> i.event(GameLoop.create_event_joystick_motion(axis=0, value=1, instance_id=7))
         >>> i.update(1)
-        >>> i.get_turn_angles()
-        {'keyboard': Angle(degrees=-0.14400000000000002), 'joystick7': Angle(degrees=0.14400000000000002)}
+        >>> angles1 = i.get_turn_angles()
+        >>> list(angles1.keys())
+        ['keyboard', 'joystick7']
+        >>> i.update(10)
+        >>> angles2 = i.get_turn_angles()
+        >>> list(angles1.keys())
+        ['keyboard', 'joystick7']
+        >>> angles2["keyboard"] < angles1["keyboard"]
+        True
+        >>> angles2["joystick7"] > angles1["joystick7"]
+        True
         """
         return self.turn_angles
 

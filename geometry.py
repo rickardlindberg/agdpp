@@ -147,6 +147,13 @@ class Point(namedtuple("Point", "x,y")):
 
 class Angle(namedtuple("Angle", "degrees")):
 
+    """
+    Can compare:
+
+    >>> Angle(5) < Angle(6)
+    True
+    """
+
     @staticmethod
     def up():
         return Angle(-90)
