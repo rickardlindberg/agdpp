@@ -9,6 +9,8 @@ from geometry import Point
 from geometry import Rectangle
 from sprites import SpriteGroup
 
+import random
+
 class BalloonShooter:
 
     """
@@ -195,6 +197,18 @@ class StartScene(SpriteGroup):
 
     def __init__(self, screen_area):
         SpriteGroup.__init__(self)
+        positions = [
+            Point(
+                x=screen_area.get_random_x(),
+                y=random.randint(screen_area.topleft.y, screen_area.bottomright.y)
+            )
+            for x in range(15)
+        ]
+        self.add(Balloons(
+            positions=positions,
+            number_of_balloons=len(positions),
+            screen_area=screen_area
+        ))
         self.input_handler = InputHandler()
         self.pending_players = []
         self.players = None
@@ -219,19 +233,22 @@ class StartScene(SpriteGroup):
         loop.draw_text(
             position=Point(x=400, y=50),
             text="Balloon Shooter",
-            size=70
+            size=70,
+            color="darkblue"
         )
         line_height = 50
         loop.draw_text(
             position=Point(x=100, y=150),
             text="Shoot to add player",
-            size=50
+            size=50,
+            color="darkred"
         )
         for index, player in enumerate(self.pending_players):
             loop.draw_text(
                 position=Point(x=150, y=220+line_height*index),
                 text=f"Player {index+1}: {player} (shoot to start game)",
-                size=40
+                size=40,
+                color="darkred"
             )
         for index, line in enumerate([
             "           CONTROLS",
@@ -248,7 +265,8 @@ class StartScene(SpriteGroup):
             loop.draw_text(
                 position=Point(x=800, y=400+index*25),
                 text=line,
-                size=30
+                size=30,
+                color="white"
             )
 
 class GameplayScene(SpriteGroup):
@@ -492,18 +510,19 @@ class Balloons(SpriteGroup):
     False
     """
 
-    def __init__(self, positions=[], screen_area=Rectangle.from_size(500, 500)):
+    def __init__(self, positions=[], screen_area=Rectangle.from_size(500, 500), number_of_balloons=3):
         SpriteGroup.__init__(self, [
             Balloon(position=position) for position in positions
         ])
         self.screen_area = screen_area
+        self.number_of_balloons = number_of_balloons
 
     def update(self, dt):
         SpriteGroup.update(self, dt)
         for balloon in self.get_sprites():
             if balloon.is_outside_of(self.screen_area):
                 self.remove(balloon)
-        while len(self.get_sprites()) < 3:
+        while len(self.get_sprites()) < self.number_of_balloons:
             self.spawn_new()
 
     def get_balloon_hit_by_arrow(self, arrow):
