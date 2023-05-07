@@ -371,22 +371,24 @@ class GameplayScene(SpriteGroup):
         SpriteGroup.__init__(self)
         self.screen_area = screen_area
         self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
-        self.bows = {}
-        bow_position = self.screen_area.bottomleft.move(dy=-120)
-        bow_increment = self.screen_area.width / (len(players)+1)
-        colors = ["blue", "green", "yellow"]
-        for player in players:
-            bow_position = bow_position.move(dx=bow_increment)
-            if colors:
-                color = colors.pop(0)
-            else:
-                color = "black"
-            self.bows[player] = self.add(Bow(position=bow_position, color=color))
+        self.init_bows(players)
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
         ]))
         self.score = self.add(Score())
         self.input_handler = InputHandler()
+
+    def init_bows(self, players):
+        self.bows = {}
+        bow_position = self.screen_area.bottomleft.move(dy=-120)
+        bow_increment = self.screen_area.width / (len(players)+1)
+        colors = ColorGenerator()
+        for player in players:
+            bow_position = bow_position.move(dx=bow_increment)
+            self.bows[player] = self.add(Bow(
+                position=bow_position,
+                color=colors.get_next()
+            ))
 
     def event(self, event):
         self.input_handler.event(event)
@@ -705,6 +707,32 @@ class Score:
 
     def draw(self, loop):
         loop.draw_text(position=Point(x=1100, y=20), text=str(self.score))
+
+class ColorGenerator:
+
+    """
+    I generate a set of colors:
+
+    >>> colors = ColorGenerator()
+    >>> colors.get_next()
+    'blue'
+    >>> colors.get_next()
+    'green'
+    >>> colors.get_next()
+    'yellow'
+    >>> colors.get_next()
+    'black'
+    >>> colors.get_next()
+    'black'
+    """
+
+    def __init__(self):
+        self.colors = ['blue', 'green', 'yellow']
+
+    def get_next(self):
+        if self.colors:
+            return self.colors.pop(0)
+        return 'black'
 
 if __name__ == "__main__":
     BalloonShooter.create().run()
