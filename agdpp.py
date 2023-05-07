@@ -129,14 +129,12 @@ class BalloonShooter:
 class GameScene(SpriteGroup):
 
     """
-    >>> screen_area = Rectangle.from_size(1280, 720)
-
     Initial state
     =============
 
     The arrow stays still:
 
-    >>> game = GameScene(screen_area)
+    >>> game = GameScene(Rectangle.from_size(1280, 720))
     >>> first_position = game.get_arrow_position()
     >>> game.update(10)
     >>> second_position = game.get_arrow_position()
@@ -145,14 +143,19 @@ class GameScene(SpriteGroup):
 
     It has no flying arrows:
 
-    >>> game = GameScene(screen_area)
+    >>> game = GameScene(Rectangle.from_size(1280, 720))
     >>> game.get_flying_arrows()
     []
+
+    The score is zero:
+
+    >>> game.get_score()
+    0
 
     Pressing space key
     ==================
 
-    >>> game = GameScene(screen_area)
+    >>> game = GameScene(Rectangle.from_size(1280, 720))
     >>> initial_position = game.get_arrow_position()
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10)
@@ -170,37 +173,67 @@ class GameScene(SpriteGroup):
     >>> game.get_arrow_position() == initial_position
     True
 
-    Arrow colliding with balloon
-    ============================
+    Shooting arrow
+    ==============
 
-    >>> game = GameScene(screen_area, balloons=[Point(x=100, y=100)], arrows=[Point(x=500, y=500)])
-    >>> len(game.get_flying_arrows())
-    1
+    Misses balloon
+    --------------
+
+    >>> game = GameScene(
+    ...     screen_area=Rectangle.from_size(1280, 720),
+    ...     balloons=[Point(x=100, y=100)],
+    ...     arrows=[Point(x=500, y=500)]
+    ... )
+    >>> (balloon_being_missed,) = game.get_balloons()
+    >>> (shooting_arrow,) = game.get_flying_arrows()
     >>> game.update(0)
-    >>> len(game.get_flying_arrows())
-    1
 
-    >>> game = GameScene(screen_area, balloons=[Point(x=500, y=500)], arrows=[Point(x=500, y=500)])
-    >>> balloons = game.get_balloons()
-    >>> len(balloons)
-    1
-    >>> len(game.get_flying_arrows())
-    1
-    >>> balloon_being_shot_down = balloons[0]
+    The balloon is still there:
+
+    >>> balloon_being_missed in game.get_balloons()
+    True
+
+    The shooting arrow is still there:
+
+    >>> shooting_arrow in game.get_flying_arrows()
+    True
+
+    No points are scored:
+
     >>> game.get_score()
     0
+
+    Hits balloon
+    ------------
+
+    >>> game = GameScene(
+    ...     screen_area=Rectangle.from_size(1280, 720),
+    ...     balloons=[Point(x=500, y=500)],
+    ...     arrows=[Point(x=500, y=500)]
+    ... )
+    >>> (balloon_being_hit,) = game.get_balloons()
+    >>> (shooting_arrow,) = game.get_flying_arrows()
     >>> game.update(0)
-    >>> balloon_being_shot_down in game.get_balloons()
+
+    The balloon disappears:
+
+    >>> balloon_being_hit in game.get_balloons()
     False
-    >>> len(game.get_flying_arrows())
-    0
+
+    The flying arrow disappears:
+
+    >>> shooting_arrow in game.get_flying_arrows()
+    False
+
+    One point is scored:
+
     >>> game.get_score()
     1
 
     Changing arrow angle
     ====================
 
-    >>> game = GameScene(screen_area)
+    >>> game = GameScene(Rectangle.from_size(1280, 720))
     >>> initial_angle = game.get_arrow_angle()
     >>> game.event(GameLoop.create_event_keydown(KEY_LEFT))
     >>> game.update(1)
@@ -212,7 +245,7 @@ class GameScene(SpriteGroup):
 
     They are removed:
 
-    >>> game = GameScene(screen_area)
+    >>> game = GameScene(Rectangle.from_size(1280, 720))
     >>> game.event(GameLoop.create_event_keydown(KEY_SPACE))
     >>> game.update(10000)
     >>> game.get_flying_arrows()
