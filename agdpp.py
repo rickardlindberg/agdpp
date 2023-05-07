@@ -182,14 +182,14 @@ class GameScene(SpriteGroup):
     Arrow colliding with balloon
     ============================
 
-    >>> game = GameScene(screen_area, balloons=[Point(x=100, y=100)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[Point(x=100, y=100)], arrows=[Point(x=500, y=500)])
     >>> len(game.get_flying_arrows())
     1
     >>> game.update(0)
     >>> len(game.get_flying_arrows())
     1
 
-    >>> game = GameScene(screen_area, balloons=[Point(x=500, y=500)], arrows=[(500, 500)])
+    >>> game = GameScene(screen_area, balloons=[Point(x=500, y=500)], arrows=[Point(x=500, y=500)])
     >>> balloons = game.get_balloons()
     >>> len(balloons)
     1
@@ -235,7 +235,7 @@ class GameScene(SpriteGroup):
         self.balloons = self.add(Balloons(balloons, screen_area))
         self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
-            Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
+            Arrow(position=position) for position in arrows
         ]))
         self.score = self.add(Score())
         self.screen_area = screen_area
