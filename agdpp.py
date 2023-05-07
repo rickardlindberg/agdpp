@@ -286,7 +286,7 @@ class Balloons(SpriteGroup):
 
     >>> balloons = Balloons([(50, 50)], space)
     >>> balloons.get_sprites()[0].get_position()
-    (50, 50)
+    Point(x=50, y=50)
     >>> balloons.update(5)
     >>> x, y = balloons.get_sprites()[0].get_position()
     >>> x
@@ -321,7 +321,7 @@ class Balloons(SpriteGroup):
     def update(self, dt):
         SpriteGroup.update(self, dt)
         for balloon in self.get_sprites():
-            if self.space.hits(Point(*balloon.get_position()), 10):
+            if self.space.hits(balloon.get_position(), 10):
                 self.remove(balloon)
         while len(self.get_sprites()) < 3:
             self.spawn_new()
@@ -484,7 +484,7 @@ class Arrow:
         >>> arrow = Arrow(position=Point(x=5, y=5), angle=-45)
         >>> new_arrow = arrow.clone_shooting()
         >>> new_arrow.get_position()
-        (5, 5)
+        Point(x=5, y=5)
         >>> new_arrow.angle
         -45
         >>> new_arrow.shooting
@@ -509,7 +509,7 @@ class Arrow:
         loop.draw_circle(self.position.add(v.times(40)), color="blue", radius=20)
 
     def get_position(self):
-        return (self.position.x, self.position.y)
+        return self.position
 
 class Balloon:
 
@@ -535,7 +535,7 @@ class Balloon:
         loop.draw_circle(position=self.position, radius=self.radius)
 
     def get_position(self):
-        return (self.position.x, self.position.y)
+        return self.position
 
 class Score:
 
