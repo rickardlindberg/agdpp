@@ -258,7 +258,7 @@ class GameScene(SpriteGroup):
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
             if hit_balloon:
                 self.balloons.remove(hit_balloon)
-                self.balloons.add(Balloon(position=Point(x=50, y=50)))
+                self.balloons.spawn_new()
                 self.score.add(1)
 
     def get_balloon_position(self):
@@ -290,6 +290,9 @@ class Balloons(SpriteGroup):
         for balloon in self.get_sprites():
             if arrow.hits_baloon(balloon):
                 return balloon
+
+    def spawn_new(self):
+        self.add(Balloon(position=Point(x=50, y=50)))
 
 class InputHandler:
 
