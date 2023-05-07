@@ -320,7 +320,8 @@ class Balloons(SpriteGroup):
                 return balloon
 
     def spawn_new(self):
-        self.add(Balloon(position=Point(x=self.screen_area.deflate(50).get_random_x(), y=50)))
+        x = self.screen_area.deflate(50).get_random_x()
+        self.add(Balloon(position=self.screen_area.topleft.set(x=x)))
 
 class InputHandler:
 
