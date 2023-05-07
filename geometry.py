@@ -1,11 +1,15 @@
 from collections import namedtuple
 import math
+import random
 
 class OutsideScreenSpace:
 
     def __init__(self, width, height):
         self.width = width
         self.height = height
+
+    def get_random_x(self, margin):
+        return random.randint(margin, self.width-margin*2)
 
     def hits(self, position, margin):
         """

@@ -42,8 +42,8 @@ class BalloonShooter:
 
     The balloon is drawn animated:
 
-    >>> set(events.filter("DRAW_CIRCLE", radius=40).collect("x", "y"))
-    {(50, 50), (51, 50)}
+    >>> len(set(events.filter("DRAW_CIRCLE", radius=40).collect("x", "y"))) > 1
+    True
 
     The arrow is drawn in a fixed position:
 
@@ -183,13 +183,9 @@ class GameScene(SpriteGroup):
     ============================
 
     >>> game = GameScene(space, balloons=[(100, 100)], arrows=[(500, 500)])
-    >>> len(game.get_balloons())
-    1
     >>> len(game.get_flying_arrows())
     1
     >>> game.update(0)
-    >>> len(game.get_balloons())
-    1
     >>> len(game.get_flying_arrows())
     1
 
@@ -197,14 +193,16 @@ class GameScene(SpriteGroup):
     >>> balloons = game.get_balloons()
     >>> len(balloons)
     1
+    >>> len(game.get_flying_arrows())
+    1
+    >>> balloon_being_shot_down = balloons[0]
     >>> game.get_score()
     0
     >>> game.update(0)
-    >>> new_balloons = game.get_balloons()
-    >>> len(new_balloons)
-    1
-    >>> new_balloons == balloons
+    >>> balloon_being_shot_down in game.get_balloons()
     False
+    >>> len(game.get_flying_arrows())
+    0
     >>> game.get_score()
     1
 
@@ -233,7 +231,7 @@ class GameScene(SpriteGroup):
     def __init__(self, space, balloons=[(50, 50)], arrows=[]):
         SpriteGroup.__init__(self)
         self.input_handler = InputHandler()
-        self.balloons = self.add(Balloons(balloons))
+        self.balloons = self.add(Balloons(balloons, space))
         self.bow = self.add(Bow())
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=Point(x=x, y=y)) for (x, y) in arrows
@@ -253,9 +251,9 @@ class GameScene(SpriteGroup):
         self.bow.turn(self.input_handler.get_turn_angle())
         SpriteGroup.update(self, dt)
         for arrow in self.flying_arrows.get_sprites():
-            if arrow.hits_space(self.space):
-                self.flying_arrows.remove(arrow)
             hit_balloon = self.balloons.get_balloon_hit_by_arrow(arrow)
+            if hit_balloon or arrow.hits_space(self.space):
+                self.flying_arrows.remove(arrow)
             if hit_balloon:
                 self.balloons.remove(hit_balloon)
                 self.balloons.spawn_new()
@@ -281,10 +279,52 @@ class GameScene(SpriteGroup):
 
 class Balloons(SpriteGroup):
 
-    def __init__(self, positions):
+    """
+    >>> space = OutsideScreenSpace(500, 500)
+
+    Balloons move downwards (move to Balloon?):
+
+    >>> balloons = Balloons([(50, 50)], space)
+    >>> balloons.get_sprites()[0].get_position()
+    (50, 50)
+    >>> balloons.update(5)
+    >>> x, y = balloons.get_sprites()[0].get_position()
+    >>> x
+    50
+    >>> y > 50
+    True
+
+    It spawns up to 3 balloons:
+
+    >>> balloons = Balloons([(50, 50)], space)
+    >>> len(balloons.get_sprites())
+    1
+    >>> balloons.update(5)
+    >>> len(balloons.get_sprites())
+    3
+
+    Balloons outside the screen is removed:
+
+    >>> balloons = Balloons([(1000, 1000)], space)
+    >>> (balloon,) = balloons.get_sprites()
+    >>> balloons.update(5)
+    >>> balloon in balloons.get_sprites()
+    False
+    """
+
+    def __init__(self, positions, space):
         SpriteGroup.__init__(self, [
             Balloon(Point(x=x, y=y)) for (x, y) in positions
         ])
+        self.space = space
+
+    def update(self, dt):
+        SpriteGroup.update(self, dt)
+        for balloon in self.get_sprites():
+            if self.space.hits(Point(*balloon.get_position()), 10):
+                self.remove(balloon)
+        while len(self.get_sprites()) < 3:
+            self.spawn_new()
 
     def get_balloon_hit_by_arrow(self, arrow):
         for balloon in self.get_sprites():
@@ -292,7 +332,7 @@ class Balloons(SpriteGroup):
                 return balloon
 
     def spawn_new(self):
-        self.add(Balloon(position=Point(x=50, y=50)))
+        self.add(Balloon(position=Point(x=self.space.get_random_x(50), y=50)))
 
 class InputHandler:
 
@@ -476,6 +516,7 @@ class Balloon:
     def __init__(self, position, radius=40):
         self.position = position
         self.radius = radius
+        self.speed = 0.1
 
     def inside(self, position):
         """
@@ -488,10 +529,7 @@ class Balloon:
         return self.position.distance_to(position) <= self.radius
 
     def update(self, dt):
-        if self.position.x > 1200:
-            self.position = self.position.set(x=50)
-        else:
-            self.position = self.position.move(dx=dt*0.3)
+        self.position = self.position.move(dy=dt*self.speed)
 
     def draw(self, loop):
         loop.draw_circle(position=self.position, radius=self.radius)
