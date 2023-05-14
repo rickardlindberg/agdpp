@@ -157,8 +157,7 @@ class GameLoop(Observable):
         joysticks = {}
         try:
             while True:
-                pygame_events = self.pygame.event.get()
-                for event in pygame_events:
+                for event in self.pygame.event.get():
                     if event.type == pygame.JOYDEVICEADDED:
                         joy = self.pygame.joystick.Joystick(event.device_index)
                         joysticks[joy.get_instance_id()] = joy
