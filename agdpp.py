@@ -769,6 +769,40 @@ class Balloon:
     def get_position(self):
         return self.position
 
+class BalloonParticle:
+
+    """
+    I shrink radius and then die:
+
+    >>> particle = BalloonParticle(position=Point(x=10, y=10), radius=10)
+    >>> particle.get_radius()
+    10
+    >>> particle.is_alive()
+    True
+
+    >>> particle.update(1000)
+    >>> particle.get_radius() < 10
+    True
+    >>> particle.is_alive()
+    False
+    """
+
+    def __init__(self, position, radius):
+        self.position = position
+        self.radius = radius
+
+    def is_alive(self):
+        return self.get_radius() > 3
+
+    def get_radius(self):
+        return self.radius
+
+    def update(self, dt):
+        self.radius -= 0.1*dt
+
+    def draw(self, loop):
+        loop.draw_circle(position=self.position, radius=self.radius)
+
 class Score:
 
     def __init__(self):
