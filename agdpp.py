@@ -410,7 +410,11 @@ class GameplayScene(SpriteGroup):
     def __init__(self, screen_area, balloons=[], arrows=[], players=["test_input_device"]):
         SpriteGroup.__init__(self)
         self.screen_area = screen_area
-        self.balloons = self.add(Balloons(positions=balloons, screen_area=screen_area))
+        self.balloons = self.add(Balloons(
+            positions=balloons,
+            screen_area=screen_area,
+            number_of_balloons=3*len(players)
+        ))
         self.init_bows(players)
         self.flying_arrows = self.add(SpriteGroup([
             Arrow(position=position) for position in arrows
@@ -483,9 +487,9 @@ class Balloons(SpriteGroup):
     >>> [x.get_position() for x in balloons.get_sprites()]
     [Point(x=10, y=10)]
 
-    When updated, I spawn new balloons up the count of 3:
+    When updated, I spawn new balloons up number_of_balloons:
 
-    >>> balloons = Balloons()
+    >>> balloons = Balloons(number_of_balloons=3)
     >>> balloons.update(0)
     >>> spawned_balloons = balloons.get_sprites()
     >>> len(spawned_balloons)
