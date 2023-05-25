@@ -10,8 +10,8 @@ def usage():
     return [
         "Usage:",
         "",
-        "    ./zero.py build",
-        "    ./zero.py rundev",
+        "    ./make.py build",
+        "    ./make.py rundev",
     ]
 
 if __name__ == "__main__":

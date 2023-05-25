@@ -4,8 +4,8 @@ http://rickardlindberg.me/projects/agdpp/
 
 Interact with the repo:
 
-    $ ./zero.py
+    $ ./make.py
     Usage:
 
-        ./zero.py build
-        ./zero.py rundev
+        ./make.py build
+        ./make.py rundev
