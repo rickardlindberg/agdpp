@@ -751,11 +751,17 @@ class Balloon:
         self.speed = 0.1
 
     def get_hit_particles(self):
+        number_of_particles = random.randint(3, 7)
         return [
             BalloonParticle(
-                position=self.position,
-                radius=self.radius
+                position=self.position.move(
+                    dx=random.randint(0, self.radius),
+                    dy=random.randint(0, self.radius)
+                ),
+                radius=self.radius*(random.randint(30, 70)/100),
             )
+            for x
+            in range(number_of_particles)
         ]
 
     def is_outside_of(self, screen_area):
