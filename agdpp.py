@@ -383,6 +383,10 @@ class GameplayScene(SpriteGroup):
     >>> len(game.get_particles()) > 0
     True
 
+    Update works after this state:
+
+    >>> game.update(0)
+
     Changing arrow angle
     ====================
 
