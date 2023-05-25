@@ -759,6 +759,7 @@ class Balloon:
                     dy=random.randint(0, self.radius)
                 ),
                 radius=self.radius*(random.randint(30, 70)/100),
+                velocity=Angle.fraction_of_whole(random.random()).to_unit_point().times(self.speed)
             )
             for x
             in range(number_of_particles)
@@ -804,7 +805,11 @@ class BalloonParticle:
     """
     I shrink radius and then die:
 
-    >>> particle = BalloonParticle(position=Point(x=10, y=10), radius=10)
+    >>> particle = BalloonParticle(
+    ...     position=Point(x=10, y=10),
+    ...     radius=10,
+    ...     velocity=Point(x=1, y=2)
+    ... )
     >>> particle.get_radius()
     10
     >>> particle.is_alive()
@@ -815,11 +820,25 @@ class BalloonParticle:
     True
     >>> particle.is_alive()
     False
+
+    I move with velocity:
+
+    >>> particle = BalloonParticle(
+    ...     position=Point(x=10, y=20),
+    ...     radius=10,
+    ...     velocity=Point(x=1, y=2)
+    ... )
+    >>> particle.get_position()
+    Point(x=10, y=20)
+    >>> particle.update(2)
+    >>> particle.get_position()
+    Point(x=12, y=24)
     """
 
-    def __init__(self, position, radius):
+    def __init__(self, position, radius, velocity):
         self.position = position
         self.radius = radius
+        self.velocity = velocity
 
     def is_alive(self):
         return self.get_radius() > 3
@@ -827,8 +846,12 @@ class BalloonParticle:
     def get_radius(self):
         return self.radius
 
+    def get_position(self):
+        return self.position
+
     def update(self, dt):
         self.radius -= 0.1*dt
+        self.position = self.position.add(self.velocity.times(dt))
 
     def draw(self, loop):
         loop.draw_circle(position=self.position, radius=self.radius)
