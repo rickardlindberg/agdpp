@@ -755,7 +755,7 @@ class Balloon:
         self.speed = 0.1
 
     def get_hit_particles(self):
-        number_of_particles = random.randint(3, 7)
+        number_of_particles = random.randint(4, 8)
         return [
             BalloonParticle(
                 position=self.position.move(
@@ -763,7 +763,7 @@ class Balloon:
                     dy=random.randint(0, self.radius)
                 ),
                 radius=self.radius*(random.randint(30, 70)/100),
-                velocity=Angle.fraction_of_whole(random.random()).to_unit_point().times(self.speed)
+                velocity=Angle.fraction_of_whole(random.random()).to_unit_point().times(self.speed*2)
             )
             for x
             in range(number_of_particles)
@@ -854,7 +854,7 @@ class BalloonParticle:
         return self.position
 
     def update(self, dt):
-        self.radius -= 0.1*dt
+        self.radius -= 0.05*dt
         self.position = self.position.add(self.velocity.times(dt))
 
     def draw(self, loop):
