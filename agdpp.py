@@ -346,6 +346,11 @@ class GameplayScene(SpriteGroup):
     >>> game.get_score()
     0
 
+    No particle is added:
+
+    >>> game.get_particles()
+    []
+
     Hits balloon
     ------------
 
@@ -372,6 +377,11 @@ class GameplayScene(SpriteGroup):
 
     >>> game.get_score()
     1
+
+    Particles are added:
+
+    >>> len(game.get_particles()) > 0
+    True
 
     Changing arrow angle
     ====================
@@ -410,6 +420,7 @@ class GameplayScene(SpriteGroup):
     def __init__(self, screen_area, balloons=[], arrows=[], players=["test_input_device"]):
         SpriteGroup.__init__(self)
         self.screen_area = screen_area
+        self.particles = self.add(ParticleEffects())
         self.balloons = self.add(Balloons(
             positions=balloons,
             screen_area=screen_area,
@@ -449,6 +460,10 @@ class GameplayScene(SpriteGroup):
             if hit_balloon or arrow.is_outside_of(self.screen_area):
                 self.flying_arrows.remove(arrow)
             if hit_balloon:
+                self.particles.add(BalloonParticle(
+                    position=hit_balloon.get_position(),
+                    radius=hit_balloon.radius
+                ))
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
 
@@ -472,6 +487,9 @@ class GameplayScene(SpriteGroup):
             if input_id == player:
                 return bow
         return bow
+
+    def get_particles(self):
+        return self.particles.get_sprites()
 
 class ParticleEffects(SpriteGroup):
 
