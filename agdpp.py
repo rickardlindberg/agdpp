@@ -460,10 +460,8 @@ class GameplayScene(SpriteGroup):
             if hit_balloon or arrow.is_outside_of(self.screen_area):
                 self.flying_arrows.remove(arrow)
             if hit_balloon:
-                self.particles.add(BalloonParticle(
-                    position=hit_balloon.get_position(),
-                    radius=hit_balloon.radius
-                ))
+                for particle in hit_balloon.get_hit_particles():
+                    self.particles.add(particle)
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
 
@@ -751,6 +749,14 @@ class Balloon:
         self.position = position
         self.radius = radius
         self.speed = 0.1
+
+    def get_hit_particles(self):
+        return [
+            BalloonParticle(
+                position=self.position,
+                radius=self.radius
+            )
+        ]
 
     def is_outside_of(self, screen_area):
         return not screen_area.inflate(self.radius*2).contains(self.position)
