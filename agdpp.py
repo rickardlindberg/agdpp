@@ -473,6 +473,36 @@ class GameplayScene(SpriteGroup):
                 return bow
         return bow
 
+class ParticleEffects(SpriteGroup):
+
+    """
+    It removes particles that are dead:
+
+    >>> class Particle:
+    ...     def is_alive(self):
+    ...         return False
+    ...     def update(self, dt):
+    ...         print(f"update {dt}")
+    >>> effects = ParticleEffects()
+    >>> particle = Particle()
+    >>> _ = effects.add(particle)
+    >>> particle in effects.get_sprites()
+    True
+    >>> effects.update(10)
+    update 10
+    >>> particle in effects.get_sprites()
+    False
+    """
+
+    def __init__(self):
+        SpriteGroup.__init__(self)
+
+    def update(self, dt):
+        SpriteGroup.update(self, dt)
+        for particle in self.get_sprites():
+            if not particle.is_alive():
+                self.remove(particle)
+
 class Balloons(SpriteGroup):
 
     """
