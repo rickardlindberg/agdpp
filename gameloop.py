@@ -185,7 +185,7 @@ class GameLoop(Observable):
             self.pygame.quit()
 
     def load_sound(self, path):
-        return Sound(self.pygame.mixer.Sound("test.wav"))
+        return Sound(self.pygame.mixer.Sound(path))
 
     def clear_screen(self):
         self.notify("CLEAR_SCREEN", {})
