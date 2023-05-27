@@ -57,8 +57,17 @@ class GameLoop(Observable):
                 self.event = NullEvent()
                 self.time = NullTime()
                 self.font = NullFontModule()
+                self.mixer = NullMixerModule()
             def quit(self):
                 pass
+        class NullMixerModule:
+            def init(self, freq):
+                pass
+            class Sound:
+                def __init__(self, path):
+                    pass
+                def play(self):
+                    pass
         class NullFont:
             def __init__(self, size):
                 pass
@@ -151,10 +160,13 @@ class GameLoop(Observable):
     def run(self, game, resolution=(1280, 720), fps=60):
         self.notify("GAMELOOP_INIT", {"resolution": resolution, "fps": fps})
         self.pygame.init()
+        self.pygame.mixer.init(48000)
         self.screen = self.pygame.display.set_mode(resolution)
         clock = self.pygame.time.Clock()
         dt = 0
         joysticks = {}
+        sound = self.pygame.mixer.Sound("test.wav")
+        sound.play()
         try:
             while True:
                 for event in self.pygame.event.get():
