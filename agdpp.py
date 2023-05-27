@@ -351,6 +351,11 @@ class GameplayScene(SpriteGroup):
     >>> game.get_particles()
     []
 
+    No sound is queued:
+
+    >>> game.get_sounds()
+    []
+
     Hits balloon
     ------------
 
@@ -382,6 +387,11 @@ class GameplayScene(SpriteGroup):
 
     >>> len(game.get_particles()) > 0
     True
+
+    Sound is queued:
+
+    >>> len(game.get_sounds())
+    1
 
     Update works after this state:
 
@@ -436,6 +446,7 @@ class GameplayScene(SpriteGroup):
         ]))
         self.score = self.add(Score())
         self.input_handler = InputHandler()
+        self.mixer = Mixer()
 
     def init_bows(self, players):
         self.bows = {}
@@ -468,6 +479,14 @@ class GameplayScene(SpriteGroup):
                     self.particles.add(particle)
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
+                self.mixer.queue("test.wav")
+
+    def draw(self, loop):
+        SpriteGroup.draw(self, loop)
+        self.mixer.play(loop)
+
+    def get_sounds(self):
+        return self.mixer.get_sounds()
 
     def get_arrow_position(self, player=None):
         return self.bow_for_player(player).get_position()
@@ -492,6 +511,39 @@ class GameplayScene(SpriteGroup):
 
     def get_particles(self):
         return self.particles.get_sprites()
+
+class Mixer:
+
+    """
+    I can add sounds and they are removed once played:
+
+    >>> mixer = Mixer()
+    >>> mixer.get_sounds()
+    []
+    >>> mixer.queue("foo")
+    >>> len(mixer.get_sounds())
+    1
+    >>> mixer.play(GameLoop.create_null())
+    >>> mixer.get_sounds()
+    []
+    """
+
+    def __init__(self):
+        self.sounds = []
+        self.cache = {}
+
+    def queue(self, sound):
+        self.sounds.append(sound)
+
+    def play(self, loop):
+        while self.sounds:
+            sound = self.sounds.pop(0)
+            if sound not in self.cache:
+                self.cache[sound] = loop.load_sound(sound)
+            self.cache[sound].play()
+
+    def get_sounds(self):
+        return list(self.sounds)
 
 class ParticleEffects(SpriteGroup):
 

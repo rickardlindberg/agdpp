@@ -51,13 +51,15 @@ class GameLoop(Observable):
     @staticmethod
     def create_null(events=[]):
         class NullPygame:
-            def init(self):
+            def __init__(self):
                 self.display = NullDisplay()
                 self.draw = NullDraw()
                 self.event = NullEvent()
                 self.time = NullTime()
                 self.font = NullFontModule()
                 self.mixer = NullMixerModule()
+            def init(self):
+                pass
             def quit(self):
                 pass
         class NullMixerModule:
@@ -165,8 +167,6 @@ class GameLoop(Observable):
         clock = self.pygame.time.Clock()
         dt = 0
         joysticks = {}
-        sound = self.pygame.mixer.Sound("test.wav")
-        sound.play()
         try:
             while True:
                 for event in self.pygame.event.get():
@@ -183,6 +183,9 @@ class GameLoop(Observable):
         finally:
             self.notify("GAMELOOP_QUIT", {})
             self.pygame.quit()
+
+    def load_sound(self, path):
+        return Sound(self.pygame.mixer.Sound("test.wav"))
 
     def clear_screen(self):
         self.notify("CLEAR_SCREEN", {})
@@ -213,6 +216,14 @@ class GameLoop(Observable):
         f = self.pygame.font.Font(size=size)
         surface = f.render(text, True, color)
         self.screen.blit(surface, (position.x, position.y))
+
+class Sound:
+
+    def __init__(self, pygame_sound):
+        self.pygame_sound = pygame_sound
+
+    def play(self):
+        self.pygame_sound.play()
 
 class Event:
 
