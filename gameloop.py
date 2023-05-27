@@ -63,7 +63,9 @@ class GameLoop(Observable):
             def quit(self):
                 pass
         class NullMixerModule:
-            def init(self, freq):
+            def pre_init(self, freq):
+                pass
+            def init(self):
                 pass
             class Sound:
                 def __init__(self, path):
@@ -161,8 +163,9 @@ class GameLoop(Observable):
 
     def run(self, game, resolution=(1280, 720), fps=60):
         self.notify("GAMELOOP_INIT", {"resolution": resolution, "fps": fps})
+        self.pygame.mixer.pre_init(48000)
         self.pygame.init()
-        self.pygame.mixer.init(48000)
+        self.pygame.mixer.init()
         self.screen = self.pygame.display.set_mode(resolution)
         clock = self.pygame.time.Clock()
         dt = 0
