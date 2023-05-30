@@ -542,10 +542,12 @@ class Mixer:
 
     def play(self, loop):
         while self.sounds:
-            sound = self.sounds.pop(0)
-            if sound not in self.cache:
-                self.cache[sound] = loop.load_sound(sound)
-            self.cache[sound].play()
+            self.load(loop, self.sounds.pop(0)).play()
+
+    def load(self, loop, sound):
+        if sound not in self.cache:
+            self.cache[sound] = loop.load_sound(sound)
+        return self.cache[sound]
 
     def get_sounds(self):
         return list(self.sounds)
