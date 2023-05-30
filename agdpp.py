@@ -479,7 +479,12 @@ class GameplayScene(SpriteGroup):
                     self.particles.add(particle)
                 self.balloons.remove(hit_balloon)
                 self.score.add(1)
-                self.mixer.queue("test.wav")
+                self.mixer.queue(random.choice([
+                    "bang1.wav",
+                    "bang2.wav",
+                    "bang3.wav",
+                    "bang4.wav",
+                ]))
 
     def draw(self, loop):
         SpriteGroup.draw(self, loop)
