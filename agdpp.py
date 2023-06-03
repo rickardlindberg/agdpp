@@ -503,7 +503,7 @@ class GameplayScene(SpriteGroup):
         return self.balloons.get_sprites()
 
     def get_score(self):
-        return self.score.score
+        return self.score.get_score()
 
     def get_arrow_angle(self, player=None):
         return self.bow_for_player(player).get_angle()
@@ -929,6 +929,9 @@ class Score(SpriteGroup):
     def add_points(self, points):
         self.score += points
         self.score_text.set(self.score)
+
+    def get_score(self):
+        return self.score
 
 class ScoreText:
 
