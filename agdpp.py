@@ -478,7 +478,7 @@ class GameplayScene(SpriteGroup):
                 for particle in hit_balloon.get_hit_particles():
                     self.particles.add(particle)
                 self.balloons.remove(hit_balloon)
-                self.score.add(1)
+                self.score.add_points(1)
                 self.mixer.queue(random.choice([
                     "bang1.wav",
                     "bang2.wav",
@@ -919,13 +919,24 @@ class BalloonParticle:
     def draw(self, loop):
         loop.draw_circle(position=self.position, radius=self.radius)
 
-class Score:
+class Score(SpriteGroup):
+
+    def __init__(self):
+        SpriteGroup.__init__(self)
+        self.score = 0
+        self.score_text = self.add(ScoreText())
+
+    def add_points(self, points):
+        self.score += points
+        self.score_text.set(self.score)
+
+class ScoreText:
 
     def __init__(self):
         self.score = 0
 
-    def add(self, points):
-        self.score += points
+    def set(self, score):
+        self.score = score
 
     def update(self, dt):
         pass
