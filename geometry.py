@@ -115,7 +115,13 @@ class Point(namedtuple("Point", "x,y")):
         >>> Point(0, 0).distance_to(Point(10, 0))
         10.0
         """
-        return math.sqrt((point.x-self.x)**2+(point.y-self.y)**2)
+        return self.vector_to(point).length()
+
+    def vector_to(self, point):
+        return Point(x=point.x-self.x, y=point.y-self.y)
+
+    def length(self):
+        return math.sqrt(self.x**2+self.y**2)
 
     def move(self, dx=0, dy=0):
         """

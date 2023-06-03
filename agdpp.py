@@ -942,13 +942,13 @@ class Score(SpriteGroup):
         self.score = 0
         self.score_text = self.add(ScoreText())
         self.medal_particles = self.add(ParticleEffects())
-        self.medals = SpriteGroup()
+        self.medals = self.add(SpriteGroup())
 
     def add_points(self, points):
         self.score += points
         self.score_text.set(self.score)
         if self.score >= (self.count_medals()+1) * 100:
-            self.medals.add(Medal())
+            self.medals.add(Medal(self.count_medals()))
             for i in range(100):
                 self.medal_particles.add(MedalParticle())
 
@@ -977,11 +977,48 @@ class ScoreText:
 
 class Medal:
 
+    """
+    I appear in the center, then move to my position:
+
+    >>> medal = Medal(0)
+    >>> medal.get_position()
+    Point(x=640, y=360)
+
+    >>> medal.update(1000)
+    >>> medal.get_position()
+    Point(x=640, y=360)
+
+    >>> medal.update(1000)
+    >>> medal.get_position()
+    Point(x=50, y=50)
+    """
+
+    RADIUS = 30
+
+    def __init__(self, number):
+        self.position = Point(
+            x=1280//2,
+            y=720//2,
+        )
+        self.target_position = Point(
+            x=20+self.RADIUS+((self.RADIUS+5)*2)*number,
+            y=20+self.RADIUS,
+        )
+        self.velocity = self.position.vector_to(self.target_position)
+        self.elapsed_time = 0
+
+    def get_position(self):
+        return self.position
+
     def update(self, dt):
-        pass
+        self.elapsed_time += dt
+        if self.elapsed_time >= 1500:
+            self.position = self.target_position
+        elif self.elapsed_time > 1000:
+            self.position = self.position.add(self.velocity.times(dt/500))
 
     def draw(self, loop):
-        pass
+        loop.draw_circle(position=self.position, radius=self.RADIUS, color="gold")
 
 class MedalParticle:
 
