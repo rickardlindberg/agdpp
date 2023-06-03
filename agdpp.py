@@ -985,14 +985,42 @@ class Medal:
 
 class MedalParticle:
 
+    """
+    >>> particle = MedalParticle()
+    >>> particle.get_radius() > 0
+    True
+    >>> particle.is_alive()
+    True
+    >>> particle.update(10000)
+    >>> particle.is_alive()
+    False
+    """
+
+    def __init__(self):
+        self.position = Point(
+            x=1280//2,
+            y=720//2,
+        )
+        self.velocity = Angle.fraction_of_whole(random.random()).to_unit_point().times(max(0.5, random.random()))
+        self.radius = 30
+        self.color = (
+            random.randint(100, 200),
+            random.randint(100, 200),
+            random.randint(100, 200),
+        )
+
     def is_alive(self):
-        return False
+        return self.get_radius() > 3
+
+    def get_radius(self):
+        return self.radius
 
     def update(self, dt):
-        pass
+        self.radius -= 0.01*dt
+        self.position = self.position.add(self.velocity.times(dt))
 
     def draw(self, loop):
-        pass
+        loop.draw_circle(position=self.position, radius=self.radius, color=self.color)
 
 class ColorGenerator:
 
