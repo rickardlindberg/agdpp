@@ -921,17 +921,45 @@ class BalloonParticle:
 
 class Score(SpriteGroup):
 
+    """
+    I can add medals with particle effects for every 100 points:
+
+    >>> score = Score()
+    >>> score.get_medal_particles()
+    []
+    >>> score.count_medals()
+    0
+
+    >>> score.add_points(100)
+    >>> len(score.get_medal_particles()) > 0
+    True
+    >>> score.count_medals()
+    1
+    """
+
     def __init__(self):
         SpriteGroup.__init__(self)
         self.score = 0
         self.score_text = self.add(ScoreText())
+        self.medal_particles = self.add(ParticleEffects())
+        self.medals = SpriteGroup()
 
     def add_points(self, points):
         self.score += points
         self.score_text.set(self.score)
+        if self.score >= (self.count_medals()+1) * 100:
+            self.medals.add(Medal())
+            for i in range(100):
+                self.medal_particles.add(MedalParticle())
 
     def get_score(self):
         return self.score
+
+    def count_medals(self):
+        return len(self.medals.get_sprites())
+
+    def get_medal_particles(self):
+        return self.medal_particles.get_sprites()
 
 class ScoreText:
 
@@ -946,6 +974,25 @@ class ScoreText:
 
     def draw(self, loop):
         loop.draw_text(position=Point(x=1100, y=20), text=str(self.score))
+
+class Medal:
+
+    def update(self, dt):
+        pass
+
+    def draw(self, loop):
+        pass
+
+class MedalParticle:
+
+    def is_alive(self):
+        return False
+
+    def update(self, dt):
+        pass
+
+    def draw(self, loop):
+        pass
 
 class ColorGenerator:
 
