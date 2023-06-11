@@ -10,6 +10,7 @@ from geometry import Rectangle
 from sprites import SpriteGroup
 
 import random
+import sys
 
 class BalloonShooter:
 
@@ -100,8 +101,8 @@ class BalloonShooter:
     """
 
     @staticmethod
-    def create():
-        return BalloonShooter(GameLoop.create())
+    def create(scene=None):
+        return BalloonShooter(loop=GameLoop.create(), scene=scene)
 
     @staticmethod
     def run_in_test_mode(events=[]):
@@ -114,10 +115,13 @@ class BalloonShooter:
         BalloonShooter(loop).run()
         return events
 
-    def __init__(self, loop):
+    def __init__(self, loop, scene=None):
         self.loop = loop
         self.resolution = (1280, 720)
-        self.game_scene = GameScene(screen_area=Rectangle.from_size(*self.resolution))
+        if scene is None:
+            self.game_scene = GameScene(screen_area=Rectangle.from_size(*self.resolution))
+        else:
+            self.game_scene = scene
 
     def run(self):
         self.loop.run(self, resolution=self.resolution)
@@ -1085,5 +1089,26 @@ class ColorGenerator:
             return self.colors.pop(0)
         return 'black'
 
+class TestSceneScore:
+
+    def __init__(self):
+        self.score = Score()
+
+    def event(self, event):
+        if event.is_user_closed_window():
+            raise ExitGameLoop()
+        elif event.is_keydown(KEY_SPACE):
+            self.score.add_points(100)
+
+    def update(self, dt):
+        self.score.update(dt)
+
+    def draw(self, loop):
+        self.score.draw(loop)
+
 if __name__ == "__main__":
-    BalloonShooter.create().run()
+    if sys.argv[1:] == ["test-scene-score"]:
+        scene = TestSceneScore()
+    else:
+        scene = None
+    BalloonShooter.create(scene).run()

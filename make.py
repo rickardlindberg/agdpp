@@ -31,7 +31,7 @@ if __name__ == "__main__":
             ))
         if not unittest.TextTestRunner().run(suite).wasSuccessful():
             sys.exit(1)
-    elif command == ["rundev"]:
-        sys.exit(subprocess.run([sys.executable, "agdpp.py"]).returncode)
+    elif command[0:1] == ["rundev"]:
+        sys.exit(subprocess.run([sys.executable, "agdpp.py"]+command[1:]).returncode)
     else:
         sys.exit("\n".join(usage()))
