@@ -31,18 +31,23 @@ class StartupApplication:
         text: 'SuperTux'
         color: 'black'
     DRAW_TEXT =>
-        x: 100
-        y: 200
+        x: 400
+        y: 300
         text: 'Balloon Shooter'
         color: 'lightblue'
+    DRAW_TEXT =>
+        x: 1000
+        y: 600
+        text: 'QUIT'
+        color: 'black'
     DRAW_CIRCLE =>
-        x: 500
-        y: 500
+        x: 400
+        y: 300
         radius: 20
         color: 'pink'
     GAMELOOP_QUIT =>
     COMMAND =>
-        command: ['python', '/home/.../agdpp/agdpp.py']
+        command: ['python3', 'agdpp.py']
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
@@ -53,18 +58,23 @@ class StartupApplication:
         text: 'SuperTux'
         color: 'black'
     DRAW_TEXT =>
-        x: 100
-        y: 200
+        x: 400
+        y: 300
         text: 'Balloon Shooter'
         color: 'lightblue'
+    DRAW_TEXT =>
+        x: 1000
+        y: 600
+        text: 'QUIT'
+        color: 'black'
     DRAW_CIRCLE =>
-        x: 500
-        y: 500
+        x: 400
+        y: 300
         radius: 20
         color: 'pink'
     GAMELOOP_QUIT =>
     COMMAND =>
-        command: ['python', '/home/.../agdpp/agdpp.py']
+        command: ['python3', 'agdpp.py']
 
     >>> StartupApplication.run_in_test_mode(
     ...     events=[
@@ -75,13 +85,13 @@ class StartupApplication:
     ...     iterations=1
     ... ).filter("DRAW_CIRCLE")
     DRAW_CIRCLE =>
-        x: 500
-        y: 500
+        x: 400
+        y: 300
         radius: 20
         color: 'pink'
     DRAW_CIRCLE =>
-        x: 500
-        y: 501
+        x: 400
+        y: 301
         radius: 20
         color: 'pink'
     """
@@ -167,7 +177,7 @@ class Command(Observable):
 class StartupScene:
 
     def __init__(self):
-        self.cursor = Point(x=500, y=500)
+        self.cursor = Point(x=400, y=300)
         self.games = [
             Game(
                 name="SuperTux",
@@ -176,8 +186,13 @@ class StartupScene:
             ),
             Game(
                 name="Balloon Shooter",
-                position=Point(x=100, y=200),
-                command=["python", "/home/.../agdpp/agdpp.py"],
+                position=Point(x=400, y=300),
+                command=["python3", "agdpp.py"],
+            ),
+            Game(
+                name="QUIT",
+                position=Point(x=1000, y=600),
+                command=["shutdown", "now"],
             ),
         ]
         self.dx = 0
@@ -194,9 +209,9 @@ class StartupScene:
         >>> scene.get_command()
         ['supertux2']
 
-        >>> scene.move_cursor(x=100, y=200)
+        >>> scene.move_cursor(x=400, y=300)
         >>> scene.get_command()
-        ['python', '/home/.../agdpp/agdpp.py']
+        ['python3', 'agdpp.py']
         """
         return self.game_closest_to_cursor().command
 
