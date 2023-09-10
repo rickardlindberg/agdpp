@@ -18,7 +18,8 @@ class StartupApplication:
     ...         [GameLoop.create_event_user_closed_window()],
     ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
-    ...     ]
+    ...     ],
+    ...     iterations=2
     ... )
     GAMELOOP_INIT =>
         resolution: (1280, 720)
@@ -60,6 +61,25 @@ class StartupApplication:
     GAMELOOP_QUIT =>
     COMMAND =>
         command: ['python', '/home/.../agdpp/agdpp.py']
+
+    >>> StartupApplication.run_in_test_mode(
+    ...     events=[
+    ...         [],
+    ...         [GameLoop.create_event_joystick_motion(axis=1, value=1.0)],
+    ...         [GameLoop.create_event_user_closed_window()],
+    ...     ],
+    ...     iterations=1
+    ... ).filter("DRAW_CIRCLE")
+    DRAW_CIRCLE =>
+        x: 500
+        y: 500
+        radius: 20
+        color: 'pink'
+    DRAW_CIRCLE =>
+        x: 500
+        y: 501
+        radius: 20
+        color: 'pink'
     """
 
     @staticmethod
@@ -75,7 +95,7 @@ class StartupApplication:
         )
 
     @staticmethod
-    def run_in_test_mode(events=[]):
+    def run_in_test_mode(events=[], iterations=2):
         loop = GameLoop.create_null(
             events=events+[
                 [GameLoop.create_event_user_closed_window()],
@@ -84,7 +104,7 @@ class StartupApplication:
         events = Events()
         StartupApplication(
             loop=events.track(loop),
-            loop_condition=FiniteLoopCondition(2),
+            loop_condition=FiniteLoopCondition(iterations),
             command=events.track(Command.create_null())
         ).run()
         return events
@@ -105,6 +125,7 @@ class StartupApplication:
 
     def tick(self, dt):
         self.loop.clear_screen()
+        self.startup_scene.update(dt)
         self.startup_scene.draw(self.loop)
 
 class Command(Observable):
@@ -155,6 +176,8 @@ class StartupScene:
                 command=["python", "/home/.../agdpp/agdpp.py"],
             ),
         ]
+        self.dx = 0
+        self.dy = 0
 
     def move_cursor(self, x, y):
         self.cursor = Point(x=x, y=y)
@@ -190,6 +213,16 @@ class StartupScene:
         """
         if event.is_user_closed_window() or event.is_joystick_down(XBOX_A):
             raise ExitGameLoop()
+        elif event.is_joystick_motion():
+            if event.get_axis() == 0:
+                self.dx = event.get_value()
+            elif event.get_axis() == 1:
+                self.dy = event.get_value()
+
+    def update(self, dt):
+        delta = Point(x=self.dx, y=self.dy)
+        if delta.length() > 0.05:
+            self.cursor = self.cursor.add(delta.times(dt))
 
     def draw(self, loop):
         for game in self.games:
