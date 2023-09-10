@@ -26,6 +26,11 @@ class StartupApplication:
         x: 100
         y: 200
         text: 'Balloon Shooter'
+    DRAW_CIRCLE =>
+        x: 500
+        y: 500
+        radius: 20
+        color: 'pink'
     GAMELOOP_QUIT =>
     GAMELOOP_INIT =>
         resolution: (1280, 720)
@@ -39,6 +44,11 @@ class StartupApplication:
         x: 100
         y: 200
         text: 'Balloon Shooter'
+    DRAW_CIRCLE =>
+        x: 500
+        y: 500
+        radius: 20
+        color: 'pink'
     GAMELOOP_QUIT =>
     """
 
@@ -83,6 +93,7 @@ class StartupApplication:
         self.loop.clear_screen()
         self.loop.draw_text(Point(x=100, y=100), text="SuperTux")
         self.loop.draw_text(Point(x=100, y=200), text="Balloon Shooter")
+        self.loop.draw_circle(Point(x=500, y=500), radius=20, color="pink")
 
 class InifiteLoopCondition:
 
