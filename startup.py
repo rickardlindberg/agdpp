@@ -80,20 +80,29 @@ class StartupApplication:
     def __init__(self, loop, loop_condition):
         self.loop = loop
         self.loop_condition = loop_condition
+        self.startup_scene = StartupScene()
 
     def run(self):
         while self.loop_condition.active():
             self.loop.run(self)
 
     def event(self, event):
-        if event.is_user_closed_window():
-            raise ExitGameLoop()
+        self.startup_scene.event(event)
 
     def tick(self, dt):
         self.loop.clear_screen()
-        self.loop.draw_text(Point(x=100, y=100), text="SuperTux")
-        self.loop.draw_text(Point(x=100, y=200), text="Balloon Shooter")
-        self.loop.draw_circle(Point(x=500, y=500), radius=20, color="pink")
+        self.startup_scene.draw(self.loop)
+
+class StartupScene:
+
+    def event(self, event):
+        if event.is_user_closed_window():
+            raise ExitGameLoop()
+
+    def draw(self, loop):
+        loop.draw_text(Point(x=100, y=100), text="SuperTux")
+        loop.draw_text(Point(x=100, y=200), text="Balloon Shooter")
+        loop.draw_circle(Point(x=500, y=500), radius=20, color="pink")
 
 class InifiteLoopCondition:
 
