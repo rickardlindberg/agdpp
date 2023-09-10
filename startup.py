@@ -1,3 +1,5 @@
+from events import Events
+from events import Observable
 from gameloop import ExitGameLoop
 from gameloop import GameLoop
 from geometry import Point
@@ -33,6 +35,8 @@ class StartupApplication:
         radius: 20
         color: 'pink'
     GAMELOOP_QUIT =>
+    COMMAND =>
+        command: ['supertux2']
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
@@ -51,6 +55,8 @@ class StartupApplication:
         radius: 20
         color: 'pink'
     GAMELOOP_QUIT =>
+    COMMAND =>
+        command: ['supertux2']
     """
 
     @staticmethod
@@ -61,7 +67,8 @@ class StartupApplication:
         """
         return StartupApplication(
             loop=GameLoop.create(),
-            loop_condition=InifiteLoopCondition()
+            loop_condition=InifiteLoopCondition(),
+            command=Command.create()
         )
 
     @staticmethod
@@ -71,21 +78,24 @@ class StartupApplication:
                 [GameLoop.create_event_user_closed_window()],
             ]
         )
-        events = loop.track_events()
+        events = Events()
         StartupApplication(
-            loop=loop,
-            loop_condition=FiniteLoopCondition(2)
+            loop=events.track(loop),
+            loop_condition=FiniteLoopCondition(2),
+            command=events.track(Command.create_null())
         ).run()
         return events
 
-    def __init__(self, loop, loop_condition):
+    def __init__(self, loop, loop_condition, command):
         self.loop = loop
         self.loop_condition = loop_condition
         self.startup_scene = StartupScene()
+        self.command = command
 
     def run(self):
         while self.loop_condition.active():
             self.loop.run(self)
+            self.command.run(self.startup_scene.get_command())
 
     def event(self, event):
         self.startup_scene.event(event)
@@ -94,7 +104,23 @@ class StartupApplication:
         self.loop.clear_screen()
         self.startup_scene.draw(self.loop)
 
+class Command(Observable):
+
+    @staticmethod
+    def create():
+        return Command()
+
+    @staticmethod
+    def create_null():
+        return Command()
+
+    def run(self, command):
+        self.notify("COMMAND", {"command": command})
+
 class StartupScene:
+
+    def get_command(self):
+        return ["supertux2"]
 
     def event(self, event):
         if event.is_user_closed_window():
