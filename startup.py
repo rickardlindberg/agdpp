@@ -6,6 +6,7 @@ class StartupApplication:
 
     """
     I draw an application select screen:
+
     >>> StartupApplication.run_in_test_mode(
     ...     events=[
     ...         [],
