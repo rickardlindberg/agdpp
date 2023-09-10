@@ -158,7 +158,10 @@ class GameScene:
 
     I can always quit the game with XBOX_START:
 
-    >>> game.event(GameLoop.create_event_keydown(XBOX_START))
+    >>> game.event(GameLoop.create_event_joystick_down(XBOX_START))
+    Traceback (most recent call last):
+      ...
+    gameloop.ExitGameLoop
     """
 
     def __init__(self, screen_area):
