@@ -215,6 +215,7 @@ class GameLoop(Observable):
             "x": position.x,
             "y": position.y,
             "text": text,
+            "color": color,
         })
         f = self.pygame.font.Font(size=size)
         surface = f.render(text, True, color)

@@ -29,10 +29,12 @@ class StartupApplication:
         x: 100
         y: 100
         text: 'SuperTux'
+        color: 'black'
     DRAW_TEXT =>
         x: 100
         y: 200
         text: 'Balloon Shooter'
+        color: 'lightblue'
     DRAW_CIRCLE =>
         x: 500
         y: 500
@@ -49,10 +51,12 @@ class StartupApplication:
         x: 100
         y: 100
         text: 'SuperTux'
+        color: 'black'
     DRAW_TEXT =>
         x: 100
         y: 200
         text: 'Balloon Shooter'
+        color: 'lightblue'
     DRAW_CIRCLE =>
         x: 500
         y: 500
@@ -194,10 +198,13 @@ class StartupScene:
         >>> scene.get_command()
         ['python', '/home/.../agdpp/agdpp.py']
         """
+        return self.game_closest_to_cursor().command
+
+    def game_closest_to_cursor(self):
         return min(
             self.games,
             key=lambda game: game.distance_to(self.cursor)
-        ).command
+        )
 
     def event(self, event):
         """
@@ -226,7 +233,7 @@ class StartupScene:
 
     def draw(self, loop):
         for game in self.games:
-            game.draw(loop)
+            game.draw(loop, self.game_closest_to_cursor())
         loop.draw_circle(self.cursor, radius=20, color="pink")
 
 class Game:
@@ -236,8 +243,12 @@ class Game:
         self.position = position
         self.command = command
 
-    def draw(self, loop):
-        loop.draw_text(self.position, text=self.name)
+    def draw(self, loop, closest):
+        loop.draw_text(
+            self.position,
+            text=self.name,
+            color="lightblue" if closest is self else "black"
+        )
 
     def distance_to(self, point):
         return self.position.distance_to(point)
