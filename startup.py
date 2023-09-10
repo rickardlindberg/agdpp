@@ -4,6 +4,8 @@ from gameloop import ExitGameLoop
 from gameloop import GameLoop
 from geometry import Point
 
+import subprocess
+
 class StartupApplication:
 
     """
@@ -106,16 +108,35 @@ class StartupApplication:
 
 class Command(Observable):
 
+    """
+    >>> Command.create().run(["echo", "hello"])
+
+    >>> Command.create().run(["command-that-does-not-exist"])
+    Traceback (most recent call last):
+      ...
+    FileNotFoundError: [Errno 2] No such file or directory: 'command-that-does-not-exist'
+
+    >>> Command.create_null().run(["command-that-does-not-exist"])
+    """
+
     @staticmethod
     def create():
-        return Command()
+        return Command(subprocess=subprocess)
 
     @staticmethod
     def create_null():
-        return Command()
+        class NullSubprocess:
+            def run(self, command):
+                pass
+        return Command(subprocess=NullSubprocess())
+
+    def __init__(self, subprocess):
+        Observable.__init__(self)
+        self.subprocess = subprocess
 
     def run(self, command):
         self.notify("COMMAND", {"command": command})
+        self.subprocess.run(command)
 
 class StartupScene:
 
