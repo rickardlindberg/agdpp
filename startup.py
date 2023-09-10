@@ -1,5 +1,6 @@
 from gameloop import ExitGameLoop
 from gameloop import GameLoop
+from geometry import Point
 
 class StartupApplication:
 
@@ -7,16 +8,37 @@ class StartupApplication:
     I draw an application select screen:
     >>> StartupApplication.run_in_test_mode(
     ...     events=[
+    ...         [],
+    ...         [GameLoop.create_event_user_closed_window()],
+    ...         [],
     ...         [GameLoop.create_event_user_closed_window()],
     ...     ]
     ... )
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
+    CLEAR_SCREEN =>
+    DRAW_TEXT =>
+        x: 100
+        y: 100
+        text: 'SuperTux'
+    DRAW_TEXT =>
+        x: 100
+        y: 200
+        text: 'Balloon Shooter'
     GAMELOOP_QUIT =>
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
+    CLEAR_SCREEN =>
+    DRAW_TEXT =>
+        x: 100
+        y: 100
+        text: 'SuperTux'
+    DRAW_TEXT =>
+        x: 100
+        y: 200
+        text: 'Balloon Shooter'
     GAMELOOP_QUIT =>
     """
 
@@ -58,7 +80,9 @@ class StartupApplication:
             raise ExitGameLoop()
 
     def tick(self, dt):
-        pass
+        self.loop.clear_screen()
+        self.loop.draw_text(Point(x=100, y=100), text="SuperTux")
+        self.loop.draw_text(Point(x=100, y=200), text="Balloon Shooter")
 
 class InifiteLoopCondition:
 
