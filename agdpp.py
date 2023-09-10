@@ -4,6 +4,7 @@ from gameloop import KEY_LEFT
 from gameloop import KEY_RIGHT
 from gameloop import KEY_SPACE
 from gameloop import XBOX_A
+from gameloop import XBOX_START
 from geometry import Angle
 from geometry import Point
 from geometry import Rectangle
@@ -154,6 +155,10 @@ class GameScene:
     >>> game.update(0)
     >>> isinstance(game.active_scene, StartScene)
     False
+
+    I can always quit the game with XBOX_START:
+
+    >>> game.event(GameLoop.create_event_keydown(XBOX_START))
     """
 
     def __init__(self, screen_area):
@@ -161,7 +166,7 @@ class GameScene:
         self.active_scene = StartScene(screen_area=self.screen_area)
 
     def event(self, event):
-        if event.is_user_closed_window():
+        if event.is_user_closed_window() or event.is_joystick_down(XBOX_START):
             raise ExitGameLoop()
         self.active_scene.event(event)
 

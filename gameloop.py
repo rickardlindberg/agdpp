@@ -6,6 +6,7 @@ KEY_SPACE = pygame.K_SPACE
 KEY_LEFT = pygame.K_LEFT
 KEY_RIGHT = pygame.K_RIGHT
 XBOX_A = 0
+XBOX_START = 7
 
 class GameLoop(Observable):
 
