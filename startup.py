@@ -2,6 +2,7 @@ from events import Events
 from events import Observable
 from gameloop import ExitGameLoop
 from gameloop import GameLoop
+from gameloop import XBOX_A
 from geometry import Point
 
 import subprocess
@@ -38,7 +39,7 @@ class StartupApplication:
         color: 'pink'
     GAMELOOP_QUIT =>
     COMMAND =>
-        command: ['supertux2']
+        command: ['python', '/home/.../agdpp/agdpp.py']
     GAMELOOP_INIT =>
         resolution: (1280, 720)
         fps: 60
@@ -58,7 +59,7 @@ class StartupApplication:
         color: 'pink'
     GAMELOOP_QUIT =>
     COMMAND =>
-        command: ['supertux2']
+        command: ['python', '/home/.../agdpp/agdpp.py']
     """
 
     @staticmethod
@@ -140,17 +141,73 @@ class Command(Observable):
 
 class StartupScene:
 
+    def __init__(self):
+        self.cursor = Point(x=500, y=500)
+        self.games = [
+            Game(
+                name="SuperTux",
+                position=Point(x=100, y=100),
+                command=["supertux2"],
+            ),
+            Game(
+                name="Balloon Shooter",
+                position=Point(x=100, y=200),
+                command=["python", "/home/.../agdpp/agdpp.py"],
+            ),
+        ]
+
+    def move_cursor(self, x, y):
+        self.cursor = Point(x=x, y=y)
+
     def get_command(self):
-        return ["supertux2"]
+        """
+        >>> scene = StartupScene()
+
+        >>> scene.move_cursor(x=100, y=100)
+        >>> scene.get_command()
+        ['supertux2']
+
+        >>> scene.move_cursor(x=100, y=200)
+        >>> scene.get_command()
+        ['python', '/home/.../agdpp/agdpp.py']
+        """
+        return min(
+            self.games,
+            key=lambda game: game.distance_to(self.cursor)
+        ).command
 
     def event(self, event):
-        if event.is_user_closed_window():
+        """
+        >>> StartupScene().event(GameLoop.create_event_user_closed_window())
+        Traceback (most recent call last):
+          ...
+        gameloop.ExitGameLoop
+
+        >>> StartupScene().event(GameLoop.create_event_joystick_down(XBOX_A))
+        Traceback (most recent call last):
+          ...
+        gameloop.ExitGameLoop
+        """
+        if event.is_user_closed_window() or event.is_joystick_down(XBOX_A):
             raise ExitGameLoop()
 
     def draw(self, loop):
-        loop.draw_text(Point(x=100, y=100), text="SuperTux")
-        loop.draw_text(Point(x=100, y=200), text="Balloon Shooter")
-        loop.draw_circle(Point(x=500, y=500), radius=20, color="pink")
+        for game in self.games:
+            game.draw(loop)
+        loop.draw_circle(self.cursor, radius=20, color="pink")
+
+class Game:
+
+    def __init__(self, name, position, command):
+        self.name = name
+        self.position = position
+        self.command = command
+
+    def draw(self, loop):
+        loop.draw_text(self.position, text=self.name)
+
+    def distance_to(self, point):
+        return self.position.distance_to(point)
 
 class InifiteLoopCondition:
 
