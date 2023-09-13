@@ -31,6 +31,11 @@ class StartupApplication:
         text: 'SuperTux'
         color: 'black'
     DRAW_TEXT =>
+        x: 150
+        y: 580
+        text: 'SuperTuxKart'
+        color: 'black'
+    DRAW_TEXT =>
         x: 400
         y: 300
         text: 'Balloon Shooter'
@@ -56,6 +61,11 @@ class StartupApplication:
         x: 100
         y: 100
         text: 'SuperTux'
+        color: 'black'
+    DRAW_TEXT =>
+        x: 150
+        y: 580
+        text: 'SuperTuxKart'
         color: 'black'
     DRAW_TEXT =>
         x: 400
