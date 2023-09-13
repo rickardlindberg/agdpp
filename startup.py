@@ -185,6 +185,11 @@ class StartupScene:
                 command=["supertux2"],
             ),
             Game(
+                name="SuperTuxKart",
+                position=Point(x=150, y=580),
+                command=["supertuxkart"],
+            ),
+            Game(
                 name="Balloon Shooter",
                 position=Point(x=400, y=300),
                 command=["python3", "agdpp.py"],
